@@ -1,0 +1,3035 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tucunaré no Rio Negro · 25 a 31/out/2026</title>
+<meta name="description" content="Guia da pescaria de tucunaré: decisão de rio, nível do Rio Negro, voo, iscas, previsão do tempo e checklist. Barco-hotel Mundo da Pesca, 25 a 31 de outubro de 2026.">
+<meta name="theme-color" content="#173a45">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400..800&family=Bitter:wght@500..800&display=swap" rel="stylesheet">
+<!--
+  GUIA PARA QUEM ATUALIZA (Fausto ou Oppen)
+  · Resumo de 4 linhas ............ <section id="resumo">
+  · Relatório dos rios ............ <section id="relatorio-mensal" data-versao="AAAA-MM-DD">
+  · Nível do Rio Negro (gráfico) .. no <script>, constante NIVEL_MANAUS e PROJECAO
+  · Voo ........................... no <script>, constante VOOS
+  · Iscas ......................... no <script>, constante ISCAS (+ fotos em img/)
+  · Prioridade da caixa ........... <section id="iscas">, lista .prioridades
+  · Plano de pesca por dia ........ bloco <script id="plano-dados"> (JSON) · ver oppen/skill-plano-pesca/SKILL.md
+  · Trajeto da viagem (mapa) ...... bloco <script id="trajeto-dados"> (JSON) · 1 item em "pontos" por localização recebida
+  · Campeonato ..................... lê as capturas do trajeto + bloco <script id="campeonato-dados"> (barcos) · ver oppen/skill-campeonato/SKILL.md
+  Status sempre com palavra (Navegável, Seco, Alta...). Sem emoji de semáforo.
+-->
+<style>
+:root{
+  --bw:oklch(0.28 0.052 222);        /* azul petróleo (rio) */
+  --bw-2:oklch(0.35 0.056 222);
+  --bw-line:oklch(1 0 0 / .12);
+  --on-bw:oklch(0.975 0.006 200);
+  --on-bw-muted:oklch(0.85 0.022 210);
+  --sun:oklch(0.86 0.15 88);          /* amarelo tucunaré: só contagem e nível previsto */
+  --mata:oklch(0.40 0.075 160);       /* verde mata escuro: blocos e rótulos */
+  --mata-soft:oklch(0.80 0.07 160);   /* verde mata claro, sobre o azul */
+  --bg:oklch(1 0 0);
+  --alt:oklch(0.965 0.008 175);
+  --surface:oklch(1 0 0);
+  --ink:oklch(0.24 0.03 222);
+  --muted:oklch(0.45 0.022 215);
+  --line:oklch(0.89 0.01 200);
+  --line-strong:oklch(0.79 0.014 200);
+  --ok:oklch(0.50 0.13 142);   --ok-bg:oklch(0.94 0.06 142);
+  --warn:oklch(0.50 0.11 65);  --warn-bg:oklch(0.95 0.06 88);
+  --bad:oklch(0.50 0.18 28);   --bad-bg:oklch(0.95 0.035 28);
+  --font:'Source Sans 3', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;  /* texto: sem serifa humanista, boa leitura no celular */
+  --font-head:'Bitter', Georgia, serif;  /* títulos e números grandes: serifa robusta de guia de campo */
+  --wrap:1120px;
+  --gut:clamp(16px, 4vw, 32px);
+  --r:12px;
+  --z-sticky:20;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; scroll-padding-top:64px; -webkit-text-size-adjust:100%; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--font); font-size:18px; line-height:1.55;
+      -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums; }
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-underline-offset:3px; text-decoration-thickness:1px; }
+a:hover{ text-decoration-thickness:2px; }
+:focus-visible{ outline:3px solid var(--sun); outline-offset:2px; border-radius:4px; }
+h1,h2,h3{ margin:0; text-wrap:balance; line-height:1.08; }
+.hero h1, h2, h3, .count-n, .clock b, .leg .t, .river-big, .lure-name, .steps li::before, .tl-list b, .status-box .now, .windows b, .progress, .qty b{ font-family:var(--font-head); }
+.river-big small, .lure-group > h3 span, .trip-h span{ font-family:var(--font); }
+
+h2{ font-size:clamp(1.85rem, 4.2vw, 2.75rem); font-weight:800; letter-spacing:-.015em; }
+h3{ font-size:1.2rem; font-weight:700; line-height:1.25; }
+p{ margin:0; text-wrap:pretty; }
+.wrap{ max-width:var(--wrap); margin:0 auto; padding-inline:var(--gut); }
+.lead{ font-size:1.15rem; color:var(--muted); max-width:62ch; margin-top:.75rem; }
+.muted{ color:var(--muted); }
+.small{ font-size:.92rem; }
+.num{ font-variant-numeric:tabular-nums; }
+b,strong{ font-weight:700; }
+
+/* ========== HERO ========== */
+.hero{ background:var(--bw); color:var(--on-bw); padding:20px 0 0; overflow:hidden; }
+.hero-top{ display:flex; justify-content:space-between; gap:12px; font-size:.9rem; color:var(--on-bw-muted); }
+.hero-top b{ color:var(--on-bw); font-weight:700; }
+/* selo de idade dos dados: fica amarelo quando passa de 3 dias */
+.fresh{ white-space:nowrap; }
+.hero-top .fresh.stale, .hero-top .fresh.stale b{ color:var(--sun); }
+.stamp.stale{ display:inline-flex; align-items:center; gap:6px; color:var(--warn); background:var(--warn-bg); padding:3px 10px; border-radius:8px; }
+.stamp.stale::before{ content:""; width:7px; height:7px; border-radius:50%; background:currentColor; }
+/* blocos recolhidos */
+.more{ margin-top:28px; border-top:1px solid var(--line-strong); }
+.more > summary, .more-in > summary{ cursor:pointer; list-style:none; display:flex; align-items:center; gap:10px; min-height:48px; font-weight:700; color:var(--mata); }
+.more > summary::-webkit-details-marker, .more-in > summary::-webkit-details-marker{ display:none; }
+.more > summary::before, .more-in > summary::before{ content:"+"; display:inline-grid; place-items:center; width:26px; height:26px; border-radius:50%; border:1.5px solid currentColor; font-size:1.1rem; line-height:1; flex:0 0 26px; }
+.more[open] > summary::before, .more-in[open] > summary::before{ content:"\2212"; }
+.more-in{ margin-top:10px; }
+.more-in > summary{ min-height:44px; font-size:.95rem; }
+.hero-grid{ display:grid; gap:28px; padding:clamp(28px,6vw,64px) 0 clamp(20px,4vw,36px); }
+@media(min-width:880px){ .hero-grid{ grid-template-columns:1fr auto; align-items:end; } }
+.hero-grid > *{ min-width:0; }
+.kicker{ color:var(--mata-soft); font-weight:700; font-size:.95rem; letter-spacing:.01em; }
+.hero h1{ font-size:clamp(2.35rem, 8.4vw, 5.6rem); overflow-wrap:break-word; font-weight:800; letter-spacing:-.01em; line-height:1.02; margin-top:.6rem; }
+.hero h1 em{ font-style:normal; color:var(--mata-soft); }
+.hero .lead{ color:var(--on-bw-muted); font-size:clamp(1.08rem,1.6vw,1.25rem); margin-top:1.1rem; }
+.hero .lead b{ color:var(--on-bw); }
+.count{ display:flex; align-items:baseline; gap:.6rem; }
+.count-n{ font-size:clamp(4.2rem, 11vw, 6rem); font-weight:800; line-height:.85; color:var(--sun); letter-spacing:-.02em; }
+.count-u{ font-size:1.25rem; font-weight:700; }
+.clock{ display:flex; gap:14px; margin-top:12px; font-size:.85rem; color:var(--on-bw-muted); }
+.clock b{ font-size:1.6rem; font-weight:800; color:var(--on-bw); margin-right:3px; font-variant-numeric:tabular-nums; }
+.count-sub{ color:var(--on-bw-muted); font-size:.95rem; margin-top:.6rem; max-width:24ch; }
+
+.chart-wrap{ border-top:1px solid var(--bw-line); padding:18px 0 8px; }
+.chart-head{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 18px; align-items:baseline; }
+.chart-head h2{ font-size:1.1rem; font-weight:700; letter-spacing:0; }
+.legend{ display:flex; flex-wrap:wrap; gap:4px 16px; font-size:.85rem; color:var(--on-bw-muted); }
+.legend i{ display:inline-block; width:18px; height:3px; vertical-align:middle; margin-right:6px; border-radius:2px; }
+#riverChart{ width:100%; height:300px; display:block; margin-top:8px; }
+@media(min-width:700px){ #riverChart{ height:340px; } }
+#riverChart .obs{ stroke-dasharray:var(--len); stroke-dashoffset:var(--len); animation:draw 1.6s var(--ease) .2s forwards; }
+@keyframes draw{ to{ stroke-dashoffset:0; } }
+.chart-note{ font-size:.85rem; color:var(--on-bw-muted); padding:4px 0 0; }
+
+.timeline{ border-top:1px solid var(--bw-line); padding:22px 0 30px; }
+.tl-track{ position:relative; height:4px; background:var(--bw-2); border-radius:2px; margin:34px 6px 0; }
+.tl-fill{ position:absolute; left:0; top:0; bottom:0; background:var(--mata-soft); border-radius:2px; }
+.tl-today{ position:absolute; top:-30px; transform:translateX(-50%); font-size:.78rem; font-weight:800; color:var(--on-bw); white-space:nowrap; }
+.tl-today::after{ content:""; position:absolute; left:50%; top:20px; width:2px; height:14px; background:var(--on-bw); transform:translateX(-50%); }
+.tl-list{ list-style:none; margin:16px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:14px 18px; }
+.tl-list li{ font-size:.92rem; color:var(--on-bw-muted); line-height:1.35; }
+.tl-list b{ display:block; color:var(--on-bw); font-size:1.02rem; }
+.tl-list li.past b{ color:var(--on-bw-muted); text-decoration:line-through; text-decoration-thickness:1px; }
+.tl-list li.next b{ color:var(--mata-soft); }
+
+/* ========== NAV ========== */
+.nav{ position:sticky; top:0; z-index:var(--z-sticky); background:oklch(1 0 0 / .96); border-bottom:1px solid var(--line);
+      backdrop-filter:saturate(1.2) blur(8px); }
+.nav ul{ list-style:none; margin:0 auto; padding:0 var(--gut); max-width:var(--wrap); display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
+.nav ul::-webkit-scrollbar{ display:none; }
+.nav a{ display:block; padding:14px 12px 12px; font-weight:700; font-size:.98rem; text-decoration:none; color:var(--muted);
+        border-bottom:3px solid transparent; white-space:nowrap; transition:color .2s, border-color .2s; }
+.nav a:hover{ color:var(--ink); }
+.nav a[aria-current="true"]{ color:var(--ink); border-bottom-color:var(--mata); }
+
+/* ========== SEÇÕES ========== */
+.sec{ padding:clamp(48px,8vw,88px) 0; }
+.sec.alt{ background:var(--alt); }
+.sec-head{ margin-bottom:clamp(24px,4vw,40px); }
+.sec-head .stamp{ display:inline-block; font-size:.88rem; font-weight:700; color:var(--mata); margin-bottom:.5rem; }
+
+/* Tags de status (sempre com palavra) */
+.tag{ display:inline-flex; align-items:center; gap:6px; font-size:.82rem; font-weight:800; letter-spacing:.02em; padding:3px 10px;
+      border-radius:999px; white-space:nowrap; line-height:1.5; }
+.tag::before{ content:""; width:7px; height:7px; border-radius:50%; background:currentColor; }
+.tag.ok{ color:var(--ok); background:var(--ok-bg); }
+.tag.warn{ color:var(--warn); background:var(--warn-bg); }
+.tag.bad{ color:var(--bad); background:var(--bad-bg); }
+.tag.neutral{ color:var(--ink); background:var(--alt); }
+
+/* Resumo */
+.essencial{ display:grid; gap:0; margin:0; }
+@media(min-width:760px){ .essencial{ grid-template-columns:repeat(3,1fr); column-gap:40px; } }
+.essencial div{ border-top:3px solid var(--mata); padding:16px 0 26px; }
+.essencial dt{ font-weight:800; font-size:.95rem; color:var(--mata); }
+.essencial dd{ margin:.35rem 0 0; font-size:clamp(1.15rem,2vw,1.35rem); line-height:1.45; font-weight:500; }
+.essencial dd b{ font-weight:800; }
+
+/* Voo */
+.flight{ display:grid; gap:28px; }
+@media(min-width:880px){ .flight{ grid-template-columns:1.3fr 1fr; align-items:start; } }
+.legs{ list-style:none; margin:0; padding:0; }
+.trip + .trip{ margin-top:36px; }
+.trip-h{ font-size:1.25rem; margin-bottom:10px; }
+.trip-h span{ display:block; font-size:.95rem; font-weight:500; color:var(--muted); margin-top:2px; }
+.leg{ display:grid; grid-template-columns:auto 1fr auto; gap:4px 16px; align-items:center; padding:18px 0; border-top:1px solid var(--line-strong); }
+.leg:last-child{ border-bottom:1px solid var(--line-strong); }
+.leg .t{ font-size:clamp(1.7rem,4vw,2.3rem); font-weight:800; line-height:1; }
+.leg .ap{ font-weight:800; font-size:1rem; color:var(--muted); }
+.leg .mid{ text-align:center; font-size:.9rem; color:var(--muted); }
+.leg .mid b{ display:block; color:var(--ink); font-size:1rem; }
+.leg .mid .line{ height:2px; background:var(--line-strong); margin:6px 0; position:relative; }
+.leg .mid .line::after{ content:""; position:absolute; right:-1px; top:-4px; border:5px solid transparent; border-left:7px solid var(--line-strong); border-right:0; }
+.leg .end{ text-align:right; }
+.leg .city{ font-size:.88rem; color:var(--muted); }
+.leg.wait{ grid-template-columns:1fr; padding:12px 0; color:var(--muted); font-size:.95rem; }
+.leg.wait b{ color:var(--ink); }
+.leg.active .t, .leg.active .mid b{ color:var(--mata); }
+.status-box{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:20px; }
+.status-box .now{ font-size:1.35rem; font-weight:800; line-height:1.3; margin:.5rem 0 .4rem; }
+.links{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.btn{ display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:10px 16px; border-radius:10px; font-weight:700; font-size:.98rem;
+      text-decoration:none; border:1.5px solid var(--ink); color:var(--ink); background:transparent; cursor:pointer; font-family:inherit;
+      transition:background .2s, color .2s; }
+.btn:hover{ background:var(--ink); color:var(--bg); text-decoration:none; }
+.btn.solid{ background:var(--mata); border-color:var(--mata); color:#fff; }
+.btn.solid:hover{ background:oklch(0.34 0.07 160); }
+
+/* Relatório */
+.report-lead{ font-size:clamp(1.2rem,2.2vw,1.5rem); line-height:1.45; max-width:58ch; font-weight:500; }
+.report-lead b{ font-weight:800; }
+.rivers{ display:grid; gap:20px; margin-top:36px; }
+@media(min-width:820px){ .rivers{ grid-template-columns:1fr 1fr; } }
+.river{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:22px; }
+.river-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+.river-big{ font-size:clamp(2.4rem,5vw,3.2rem); font-weight:800; line-height:1; margin:18px 0 4px; letter-spacing:-.01em; }
+.river-big small{ font-size:1rem; font-weight:700; color:var(--muted); margin-left:6px; letter-spacing:0; }
+.river p{ color:var(--muted); font-size:.98rem; }
+.facts{ margin:16px 0 0; }
+.facts div{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; padding:9px 0; border-top:1px solid var(--line); font-size:.98rem; }
+.facts dt{ color:var(--muted); }
+.facts dd{ margin:0; text-align:right; font-weight:700; }
+.facts dd.hl{ color:var(--mata); }
+.facts dd.bad{ color:var(--bad); }
+.cols{ display:grid; gap:36px; margin-top:44px; }
+@media(min-width:820px){ .cols{ grid-template-columns:1fr 1fr; gap:48px; } }
+.cols h3{ margin-bottom:12px; }
+.plain{ list-style:none; margin:0; padding:0; }
+.plain li{ padding:12px 0; border-top:1px solid var(--line); }
+.plain li:last-child{ border-bottom:1px solid var(--line); }
+.plain li .tag{ margin-right:8px; vertical-align:2px; }
+.fontes{ margin-top:36px; border-top:1px solid var(--line); padding-top:14px; }
+.fontes summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:8px; list-style:none; }
+.fontes summary::-webkit-details-marker{ display:none; }
+.fontes summary::before{ content:"+"; font-size:1.3rem; width:1ch; color:var(--mata); }
+.fontes[open] summary::before{ content:"−"; }
+.fontes ul{ margin:8px 0 0; padding-left:1.2rem; font-size:.95rem; }
+.fontes li{ margin:.35rem 0; }
+
+/* Iscas */
+.prio{ list-style:none; margin:0 0 48px; padding:0; display:grid; gap:0; }
+@media(min-width:820px){ .prio{ grid-template-columns:1fr 1fr; column-gap:40px; } }
+.prio li{ display:grid; grid-template-columns:98px 1fr; gap:14px; padding:14px 0; border-top:1px solid var(--line-strong); }
+.prio li .tag{ justify-self:start; align-self:start; margin-top:2px; }
+.lure-group{ margin-top:40px; }
+.lure-group > h3{ font-size:1.35rem; display:flex; align-items:baseline; gap:12px; }
+.lure-group > h3 span{ font-size:.95rem; font-weight:600; color:var(--muted); }
+.lure-group > p{ color:var(--muted); margin-top:4px; max-width:65ch; }
+.lures{ list-style:none; margin:16px 0 0; padding:0; display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr)); }
+.lure{ display:grid; grid-template-columns:112px 1fr; gap:8px 16px; align-content:start; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px; }
+.lure-pic{ width:112px; height:112px; border-radius:8px; overflow:hidden; background:#fff; border:1px solid var(--line); position:relative; }
+.lure-pic img{ width:100%; height:100%; object-fit:contain; }
+.lure-pic.sw{ display:flex; border:1px solid var(--line-strong); }
+.lure-pic.sw span{ flex:1; }
+.lure-pic.sw em{ position:absolute; left:0; right:0; bottom:0; font-style:normal; font-size:.72rem; text-align:center; background:oklch(1 0 0 / .9); color:var(--muted); padding:2px 0; }
+.lure-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.lure-name{ font-weight:800; font-size:1.08rem; line-height:1.2; }
+.lure-maker{ font-size:.86rem; color:var(--muted); }
+.qty{ flex:0 0 auto; text-align:center; min-width:46px; border:1.5px solid var(--ink); border-radius:8px; padding:2px 6px; line-height:1.1; }
+.qty b{ display:block; font-size:1.25rem; font-weight:800; }
+.qty span{ font-size:.7rem; font-weight:700; color:var(--muted); }
+.lure-spec{ font-weight:700; color:var(--mata); font-size:.95rem; margin-top:6px; }
+.lure-use{ font-size:.95rem; line-height:1.45; margin-top:4px; }
+.swatches{ display:flex; flex-wrap:wrap; gap:10px 14px; margin-top:10px; }
+.swatches span{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; font-size:.8rem; line-height:1.15; color:var(--ink); max-width:80px; }
+/* amostra em formato de isca: corpo, cabeça à esquerda e olho */
+.swatches i{ position:relative; display:block; width:64px; height:22px; border-radius:11px 40% 40% 11px / 11px 50% 50% 11px;
+             border:1px solid oklch(0.24 0.03 222 / .45); box-shadow:inset 0 -3px 4px oklch(0 0 0 / .12), inset 0 2px 3px oklch(1 0 0 / .35); }
+.swatches i::after{ content:""; position:absolute; left:8px; top:6px; width:6px; height:6px; border-radius:50%; background:#111; box-shadow:0 0 0 1.5px #f4e9a8; }
+.lure > .swatches, .lure > .credit{ grid-column:2; }
+.lure > .swatches{ margin-top:0; }
+.credit{ font-size:.78rem; color:var(--muted); margin-top:6px; }
+.subtotal{ margin-top:32px; padding:18px 20px; border-radius:var(--r); background:var(--mata); color:var(--on-bw); }
+.subtotal .muted{ color:oklch(0.88 0.03 160); }
+.subtotal p + p{ margin-top:6px; }
+
+/* Táticas */
+.day{ margin-top:8px; }
+.day-axis{ position:relative; height:84px; border-radius:10px; background:linear-gradient(90deg, oklch(0.30 0.04 260) 0%, oklch(0.80 0.09 80) 14%, oklch(0.95 0.05 95) 50%, oklch(0.80 0.09 70) 86%, oklch(0.30 0.04 260) 100%); }
+.win{ position:absolute; top:10px; bottom:10px; border-radius:7px; background:var(--mata); color:var(--on-bw); padding:6px 8px; font-size:.8rem; line-height:1.2; overflow:hidden; }
+.win b{ display:block; font-size:.9rem; color:var(--on-bw); }
+.win.mid{ background:oklch(1 0 0 / .85); color:var(--ink); border:1.5px solid var(--ink); }
+.win.mid b{ color:var(--ink); }
+@media(max-width:600px){ .day-axis{ height:56px; } .win{ padding:6px 5px; font-size:0; } .win b{ font-size:.72rem; } }
+.day-ticks{ position:relative; height:22px; font-size:.78rem; color:var(--muted); }
+.day-ticks span{ position:absolute; transform:translateX(-50%); top:4px; }
+.windows{ display:grid; gap:0; margin-top:18px; }
+@media(min-width:820px){ .windows{ grid-template-columns:repeat(3,1fr); column-gap:32px; } }
+.windows div{ border-top:2px solid var(--ink); padding:12px 0 18px; }
+.windows b{ font-size:1.15rem; display:block; }
+.steps{ margin:0; padding:0; list-style:none; counter-reset:s; }
+.steps li{ counter-increment:s; display:grid; grid-template-columns:36px 1fr; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
+.steps li::before{ content:counter(s); font-weight:800; font-size:1.3rem; color:var(--mata); line-height:1.2; }
+.water li{ display:grid; grid-template-columns:44px 1fr; gap:14px; align-items:center; }
+.water .w{ width:44px; height:44px; border-radius:50%; border:1px solid var(--line-strong); }
+
+/* Previsão */
+.fc-meta{ display:flex; flex-wrap:wrap; gap:6px 24px; margin-top:22px; font-size:.95rem; color:var(--muted); }
+.fc-meta b{ color:var(--ink); }
+.fc{ list-style:none; margin:14px 0 0; padding:0; }
+.fc-row{ display:grid; grid-template-columns:5.6rem 22px 1fr; gap:4px 12px; align-items:center; padding:12px 0; border-top:1px solid var(--line); }
+.fc-row:last-child{ border-bottom:1px solid var(--line); }
+.fc-empty{ padding:14px 0; border-top:1px solid var(--line); color:var(--muted); }
+.fc-more{ border-top:1px solid var(--line); }
+.fc-more .fc{ margin-top:0; }
+.fc-date{ font-weight:700; line-height:1.2; }
+.fc-date small{ display:block; font-weight:500; color:var(--muted); font-size:.82rem; }
+.fc-bar{ display:flex; align-items:center; gap:10px; }
+.fc-bar .bar{ flex:1; height:6px; border-radius:3px; background:var(--line); overflow:hidden; max-width:140px; }
+.fc-bar .bar i{ display:block; height:100%; border-radius:5px; }
+.fc-bar b{ font-size:1.05rem; min-width:2.2ch; }
+.fc-bar .lbl{ font-size:.8rem; font-weight:600; min-width:5.5em; color:var(--muted) !important; }
+.fc-wx{ grid-column:3; font-size:.88rem; color:var(--muted); }
+.fc-tip{ grid-column:1 / -1; font-size:.92rem; }
+.fc-row.trip{ background:none; }
+@media(min-width:900px){
+  .fc-row{ grid-template-columns:6.5rem 22px 17rem 14rem 1fr; }
+  .fc-wx{ grid-column:auto; }
+  .fc-tip{ grid-column:auto; }
+}
+.skeleton{ height:46px; border-top:1px solid var(--line); background:linear-gradient(90deg, transparent, var(--alt), transparent); background-size:200% 100%; animation:sk 1.4s linear infinite; }
+@keyframes sk{ to{ background-position:-200% 0; } }
+
+/* Vídeo */
+.video{ position:relative; aspect-ratio:16/9; border-radius:var(--r); overflow:hidden; background:var(--bw); }
+.video iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+
+/* Equipamento */
+.gear{ display:grid; gap:36px 48px; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); }
+.gear h3{ margin-bottom:8px; }
+.gear ul{ margin:0; padding:0; list-style:none; }
+.gear ul li{ padding:9px 0; border-top:1px solid var(--line); font-size:.98rem; }
+.tbl{ width:100%; border-collapse:collapse; font-size:.95rem; }
+.tbl th{ text-align:left; font-size:.82rem; color:var(--muted); font-weight:700; padding:6px 8px 6px 0; border-bottom:1.5px solid var(--ink); }
+.tbl td{ padding:9px 8px 9px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+.tbl td:first-child{ font-weight:700; }
+.note{ margin-top:36px; padding:16px 20px; border-radius:var(--r); background:var(--warn-bg); color:oklch(0.34 0.07 65); }
+
+/* Checklist */
+.check-head{ display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:12px; }
+.progress{ font-weight:800; font-size:1.1rem; }
+.pbar{ height:6px; background:var(--line); border-radius:3px; margin-top:14px; overflow:hidden; }
+.pbar i{ display:block; height:100%; background:var(--ok); transform-origin:left; transform:scaleX(0); transition:transform .4s var(--ease); }
+.checks{ list-style:none; margin:18px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); column-gap:40px; }
+.checks label{ display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--line); cursor:pointer; min-height:44px; }
+.checks input{ width:22px; height:22px; margin:2px 0 0; accent-color:oklch(0.47 0.11 150); flex:0 0 22px; }
+.checks input:checked + span{ color:var(--muted); text-decoration:line-through; }
+
+/* Rodapé */
+.foot{ background:var(--bw); color:var(--on-bw-muted); padding:48px 0 56px; font-size:.95rem; }
+.foot h2{ color:var(--on-bw); font-size:1.4rem; }
+.foot dl{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px 32px; margin:20px 0 32px; }
+.foot dt{ font-size:.85rem; color:var(--mata-soft); font-weight:700; }
+.foot dd{ margin:2px 0 0; color:var(--on-bw); }
+.foot a{ color:var(--on-bw); }
+
+/* plano por dia */
+.days{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+.days::-webkit-scrollbar{ display:none; }
+.days button{ flex:0 0 auto; min-height:52px; min-width:76px; padding:6px 12px; border-radius:10px; border:1.5px solid var(--line-strong);
+  background:var(--surface); font:inherit; color:var(--ink); cursor:pointer; text-align:center; line-height:1.15; }
+.days button b{ display:block; font-family:var(--font-head); font-size:1.15rem; }
+.days button small{ font-size:.78rem; color:var(--muted); }
+.days button[aria-pressed="true"]{ background:var(--mata); border-color:var(--mata); color:#fff; }
+.days button[aria-pressed="true"] small{ color:oklch(0.9 0.03 160); }
+.day-info{ display:flex; flex-wrap:wrap; gap:6px 18px; margin:18px 0 6px; font-size:.95rem; color:var(--muted); }
+.day-info b{ color:var(--ink); }
+.day-note{ margin:6px 0 0; padding:12px 14px; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); }
+.periods{ display:grid; gap:14px; margin-top:16px; }
+@media(min-width:900px){ .periods{ grid-template-columns:repeat(3,1fr); } }
+.period{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px; display:flex; flex-direction:column; gap:10px; }
+.period.now{ border:2px solid var(--mata); }
+.period-h{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.period-h h3{ font-size:1.2rem; }
+.period-h span{ font-size:.9rem; color:var(--muted); white-space:nowrap; }
+.cond{ display:flex; flex-wrap:wrap; gap:4px 12px; font-size:.86rem; color:var(--muted); }
+.pick{ display:grid; grid-template-columns:72px 1fr; gap:12px; align-items:center; }
+.pick .lure-pic{ width:72px; height:72px; }
+.pick-name{ font-family:var(--font-head); font-weight:700; font-size:1.1rem; line-height:1.2; }
+.pick-alt{ font-size:.9rem; color:var(--muted); }
+.period .swatches{ margin-top:0; }
+.how{ font-size:.95rem; }
+.why{ margin:0; padding-left:1.1rem; font-size:.86rem; color:var(--muted); }
+.why li{ margin:2px 0; }
+.src{ font-size:.78rem; font-weight:700; }
+.src.auto{ color:var(--muted); }
+.src.man{ color:var(--mata); }
+.plano-foot{ margin-top:14px; font-size:.86rem; color:var(--muted); }
+
+@media(max-width:600px){
+  .lure{ grid-template-columns:76px 1fr; gap:8px 12px; padding:12px; }
+  .lure-pic{ width:76px; height:76px; }
+  .lure-spec{ margin-top:2px; }
+  .lure-use{ font-size:.9rem; }
+  .lure > .swatches{ grid-column:1 / -1; gap:6px 14px; margin-top:2px; }
+  .swatches span{ flex-direction:row; align-items:center; gap:6px; max-width:none; font-size:.8rem; }
+  .swatches i{ width:36px; height:14px; flex:0 0 36px; }
+  .swatches i::after{ left:5px; top:3px; width:5px; height:5px; }
+  .lure > .credit{ display:none; }
+  .prio li{ grid-template-columns:76px 1fr; gap:10px; padding:12px 0; }
+}
+
+/* Trajeto da viagem (mapa) */
+.trajeto{ display:grid; gap:24px; }
+@media(min-width:900px){ .trajeto{ grid-template-columns:1.7fr 1fr; align-items:start; } }
+#mapaTrajeto{ height:clamp(340px,60vw,540px); border-radius:var(--r); overflow:hidden; background:var(--alt); border:1px solid var(--line); z-index:0; }
+.mapa-msg{ display:grid; place-items:center; height:100%; padding:24px; text-align:center; color:var(--muted); }
+.paradas{ list-style:none; margin:0; padding:0; }
+@media(min-width:900px){ .paradas{ max-height:540px; overflow:auto; } }
+.paradas li{ display:grid; grid-template-columns:30px 1fr; gap:12px; padding:12px 4px; border-bottom:1px solid var(--line); cursor:pointer; border-radius:8px; }
+.paradas li:hover, .paradas li:focus-visible{ background:var(--surface); outline:none; }
+.paradas .n, .pin-n{ width:28px; height:28px; border-radius:50%; background:var(--mata); color:#fff; font-weight:800; font-size:.85rem; display:grid; place-items:center; }
+.paradas li.ult .n, .pin-n.ult{ background:var(--sun); color:var(--ink); }
+.paradas time{ display:block; font-size:.88rem; font-weight:700; color:var(--mata); }
+.paradas b{ display:block; font-family:var(--font-head); font-size:1.05rem; }
+.paradas p{ color:var(--muted); font-size:.95rem; margin-top:2px; }
+.camp-regras{ display:grid; gap:0; margin:0; padding:0; list-style:none; counter-reset:r; }
+@media(min-width:820px){ .camp-regras{ grid-template-columns:1fr 1fr; column-gap:40px; } }
+.camp-regras li{ counter-increment:r; display:grid; grid-template-columns:34px 1fr; gap:10px; padding:12px 0; border-top:1px solid var(--line); }
+.camp-regras li::before{ content:counter(r); font-family:var(--font-head); font-weight:800; font-size:1.25rem; color:var(--mata); }
+.premio{ display:grid; gap:12px; margin-top:22px; }
+@media(min-width:700px){ .premio{ grid-template-columns:1fr 1fr; } }
+.premio div{ background:var(--bw); color:var(--on-bw); border-radius:var(--r); padding:16px 18px; }
+.premio b{ display:block; font-family:var(--font-head); font-size:1.25rem; color:var(--sun); margin-bottom:2px; }
+.lider{ display:grid; gap:18px; margin-top:32px; background:var(--surface); border:2px solid var(--mata); border-radius:var(--r); padding:18px; }
+@media(min-width:820px){ .lider{ grid-template-columns:minmax(0,1.1fr) 1fr; align-items:center; } }
+.lider img{ width:100%; max-height:420px; object-fit:cover; border-radius:10px; background:var(--alt); }
+.lider .tag{ margin-bottom:8px; }
+.lider-cm{ font-family:var(--font-head); font-weight:800; font-size:clamp(3rem,8vw,4.5rem); line-height:1; color:var(--ink); }
+.lider-cm small{ font-family:var(--font); font-size:1.1rem; font-weight:700; color:var(--muted); margin-left:6px; }
+.lider-quem{ font-size:1.15rem; margin-top:6px; }
+.lider-det{ color:var(--muted); font-size:.95rem; margin-top:6px; }
+.camp-vazio{ margin-top:28px; padding:20px; border:1px dashed var(--line-strong); border-radius:var(--r); color:var(--muted); }
+.ranking{ width:100%; border-collapse:collapse; margin-top:12px; font-size:.98rem; }
+.ranking th{ text-align:left; font-size:.82rem; color:var(--muted); font-weight:700; padding:6px 8px 6px 0; border-bottom:1.5px solid var(--ink); }
+.ranking td{ padding:11px 8px 11px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+.ranking td.pos{ font-family:var(--font-head); font-weight:800; font-size:1.2rem; color:var(--mata); width:2.2em; }
+.ranking td.cm{ font-family:var(--font-head); font-weight:800; font-size:1.15rem; white-space:nowrap; }
+.ranking small{ display:block; color:var(--muted); font-size:.84rem; }
+/* corrida: uma raia por pescador, o maior tucunaré avança na pista */
+.corrida{ margin-top:30px; background:var(--bw); color:var(--on-bw); border-radius:var(--r); padding:18px 16px 14px; }
+.corrida-topo{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 16px; align-items:baseline; margin-bottom:10px; }
+.corrida-topo h3{ color:var(--on-bw); font-size:1.15rem; }
+.corrida-topo p{ color:var(--on-bw-muted); font-size:.92rem; }
+.corrida-topo p b{ color:var(--sun); }
+.escala{ position:relative; height:22px; margin-left:var(--nome-w); font-size:.75rem; color:var(--on-bw-muted); }
+.escala span{ position:absolute; top:4px; transform:translateX(-50%); white-space:nowrap; }
+.escala span:last-child{ transform:translateX(-100%); }
+.escala span:first-child{ transform:none; }
+.raias{ list-style:none; margin:0; padding:0; }
+.corrida{ --nome-w:0px; }
+@media(min-width:760px){ .corrida{ --nome-w:190px; } }
+.raia{ display:grid; grid-template-columns:1fr; gap:4px; padding:10px 0; border-top:1px dashed oklch(1 0 0 / .18); }
+@media(min-width:760px){ .raia{ grid-template-columns:var(--nome-w) 1fr; align-items:center; gap:0; } }
+.raia-nome{ display:flex; align-items:baseline; gap:8px; min-width:0; padding-right:10px; }
+.raia-nome .pos{ font-family:var(--font-head); font-weight:800; font-size:1.15rem; color:var(--on-bw-muted); min-width:1.6em; }
+.raia-nome b{ font-size:1rem; color:var(--on-bw); }
+.raia-nome small{ display:block; font-size:.8rem; color:var(--on-bw-muted); }
+.raia.frente .raia-nome .pos{ color:var(--sun); }
+.pista{ position:relative; height:52px; border-radius:26px; background:repeating-linear-gradient(90deg, oklch(1 0 0 / .06) 0 1px, transparent 1px 10%), oklch(1 0 0 / .05); }
+.pista::after{ content:""; position:absolute; right:0; top:0; bottom:0; width:10px; border-radius:0 26px 26px 0;
+  background:repeating-linear-gradient(0deg, #fff 0 6px, #111 6px 12px); opacity:.85; }
+.rastro{ position:absolute; left:0; top:50%; height:4px; transform:translateY(-50%); border-radius:2px; background:oklch(0.80 0.07 160 / .55); width:var(--x); }
+.raia.frente .rastro{ background:oklch(0.86 0.15 88 / .7); }
+.corredor{ position:absolute; top:50%; left:var(--x); transform:translate(-50%,-50%); display:flex; align-items:center; gap:6px; text-decoration:none; z-index:1; }
+.corredor img, .corredor .bola{ width:44px; height:44px; border-radius:50%; object-fit:cover; border:3px solid var(--mata-soft); background:var(--bw-2); display:block; }
+.raia.frente .corredor img, .raia.frente .corredor .bola{ border-color:var(--sun); width:50px; height:50px; }
+.corredor .cm{ position:absolute; left:50%; bottom:100%; transform:translateX(-50%); margin-bottom:2px; white-space:nowrap;
+  font-family:var(--font-head); font-weight:800; font-size:.95rem; color:var(--on-bw); background:var(--bw); padding:0 6px; border-radius:6px; }
+.raia.frente .corredor .cm{ color:var(--sun); }
+.raia.parado .corredor{ left:0; transform:translate(0,-50%); }
+.raia.parado .corredor .bola{ width:30px; height:30px; border-width:2px; opacity:.6; }
+.raia.parado .corredor .cm{ display:none; }
+.raia-vazia{ padding:16px 4px 6px; color:var(--on-bw-muted); }
+.raias > .raia:first-child{ padding-top:22px; }
+@media(max-width:759px){ .raia{ gap:22px; } .raias > .raia:first-child{ padding-top:10px; } }
+.corrida-pe{ margin-top:10px; font-size:.8rem; color:var(--on-bw-muted); }
+.galeria{ list-style:none; margin:14px 0 0; padding:0; display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+.galeria li{ background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.galeria img{ width:100%; aspect-ratio:1; object-fit:cover; display:block; background:var(--alt); }
+.galeria div{ padding:8px 10px; font-size:.84rem; color:var(--muted); line-height:1.35; }
+.galeria b{ display:block; font-family:var(--font-head); font-size:1.1rem; color:var(--ink); }
+.trajeto-vazio{ padding:20px; border:1px dashed var(--line-strong); border-radius:var(--r); color:var(--muted); }
+.pin{ background:none; border:0; }
+.pin-n{ box-shadow:0 0 0 3px #fff, 0 2px 6px oklch(0 0 0 / .35); }
+.paradas li.cap .n, .pin-n.cap{ background:var(--bw); color:var(--sun); }
+.paradas .cap-linha{ display:block; margin-top:4px; font-weight:700; color:var(--ink); font-size:.95rem; }
+.paradas .foto{ display:block; margin-top:10px; max-width:280px; border-radius:8px; overflow:hidden; background:var(--line); }
+.paradas .foto img{ display:block; width:100%; height:auto; }
+.paradas .fotos{ display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:6px; margin-top:8px; max-width:380px; }
+.paradas .fotos a{ display:block; aspect-ratio:1; border-radius:6px; overflow:hidden; background:var(--line); }
+.paradas .fotos img{ width:100%; height:100%; object-fit:cover; display:block; }
+.pop-mais{ display:block; font-size:.8rem; color:var(--muted); margin:-2px 0 6px; }
+.pop-foto{ display:block; width:220px; max-width:100%; height:auto; border-radius:6px; margin-bottom:6px; }
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  #riverChart .obs{ stroke-dashoffset:0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top"><span><b>Pescaria 2026</b> · Mundo da Pesca</span><span class="fresh" data-fresh="hero">Dados de <b>24/out</b></span></div>
+    <div class="hero-grid">
+      <div>
+        <div class="kicker">Barco-hotel saindo de Manaus · 25 a 31 de outubro</div>
+        <h1>Tucunaré no <em>Rio Negro</em></h1>
+        <p class="lead">O Rio Branco está seco demais para o barco. A viagem vai pelo Rio Negro, com <b>confiança alta</b> no relatório de 24/out.</p>
+      </div>
+      <div>
+        <div class="count"><span class="count-n" id="cdN">1</span><span class="count-u" id="cdU">dia</span></div>
+        <div class="clock" id="cdClock" aria-hidden="true"><span><b>--</b>h</span><span><b>--</b>min</span><span><b>--</b>s</span></div>
+        <p class="count-sub" id="cdSub">até o embarque, 25/out às 06:55 em Guarulhos</p>
+      </div>
+    </div>
+
+    <figure class="chart-wrap" style="margin:0">
+      <div class="chart-head">
+        <h2>Nível do Rio Negro em Manaus, em metros</h2>
+        <div class="legend" aria-hidden="true">
+          <span><i style="background:var(--on-bw)"></i>medido (SGB e Porto de Manaus)</span>
+          <span><i style="background:var(--sun)"></i>previsão do relatório</span>
+          <span><i style="background:oklch(0.72 0.14 32)"></i>alerta 15 m</span>
+        </div>
+      </div>
+      <svg id="riverChart" role="img" aria-label="Gráfico: o Rio Negro em Manaus desceu de 28,5 m em 30 de junho para 16,90 m em 23 de outubro. A projeção para 25 de outubro é de 16,7 a 16,8 metros, acima do alerta de 15 m e da mínima recorde de 12,13 m."></svg>
+      <figcaption class="chart-note">Na viagem o rio deve estar entre <b style="color:var(--on-bw)">16,7 e 16,8 m</b>: baixo, mas navegável. Abaixo de 15 m o relatório passa a alerta.</figcaption>
+    </figure>
+
+    <div class="timeline" aria-label="Linha do tempo até a viagem">
+      <div class="tl-track"><div class="tl-fill" id="tlFill"></div><div class="tl-today" id="tlToday">hoje</div></div>
+      <ol class="tl-list" id="tlList">
+        <li data-d="2026-10-16"><b>16/out</b>Relatório passa a ser diário</li>
+        <li data-d="2026-10-24"><b>24/out</b>Último relatório antes da viagem</li>
+        <li data-d="2026-10-25"><b>25/out</b>Voo, embarque e navegação</li>
+        <li data-d="2026-10-26"><b>26/out</b>Primeira pesca e lua cheia</li>
+        <li data-d="2026-10-31"><b>31/out</b>Voo de volta às 18:00</li>
+      </ol>
+    </div>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Seções">
+  <ul>
+    <li><a href="#voo">Voos</a></li>
+    <li><a href="#plano">Plano do dia</a></li>
+    <li><a href="#trajeto">Trajeto</a></li>
+    <li><a href="#campeonato">Campeonato</a></li>
+    <li><a href="#relatorio-mensal">Rios</a></li>
+    <li><a href="#iscas">Iscas</a></li>
+    <li><a href="#checklist">Checklist</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ===== RESUMO · reescrever a cada relatório ===== -->
+<section id="resumo" class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="stamp" data-fresh="stamp">Atualizado em 24/out/2026</span>
+      <h2>O essencial</h2>
+    </div>
+    <dl class="essencial">
+      <div><dt>Voos</dt><dd>Ida <b>domingo 25/out, 06:55</b> em Guarulhos; de Manaus direto para o barco no Píer da Ponta Negra. Volta <b>sábado 31/out, 18:00</b> de Manaus.</dd></div>
+      <div><dt>Iscas</dt><dd><b>Superfície de 12 a 14 cm</b> (Rocket 140, Borá 12) branco-bone, natural ou cromada de manhã e no fim da tarde; 9 a 10 cm com peixe manhoso. <b>Jig 1/2 oz vermelho e amarelo e BacaShad</b> no meio do dia.</dd></div>
+      <div><dt>Melhores horários</dt><dd><b>27/out</b> é o melhor dia de pesca (nota 83). A chuva da semana perdeu força; o cuidado agora é o vento em 28 e 30/out (rajadas de 42 a 55 km/h). <b>30/out no amanhecer</b> tem a lua alta junto com o nascer do sol. Domingo 25 é só navegação e sábado 31 é dia de volta.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ===== VOO · dados em VOOS no script ===== -->
+<section id="voo" class="sec alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Voos</h2>
+      <p class="lead">Horários de cada aeroporto. Manaus tem 1 hora a menos que São Paulo e Brasília.</p>
+    </div>
+    <div class="flight">
+      <div id="trips"></div>
+      <aside class="status-box" aria-live="polite">
+        <span class="tag neutral" id="fStatusTag">Programado</span>
+        <p class="now" id="fStatus">Embarque em Guarulhos às 06:55.</p>
+        <p class="muted small" id="fDetail">Status calculado pelo horário marcado. Atraso ou mudança de portão aparecem nos links abaixo, ao vivo.</p>
+        <div class="links" id="fLinks"></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PLANO DE PESCA POR DIA · calculado da previsão + bloco plano-dados (Oppen atualiza) ===== -->
+<section id="plano" class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Plano de pesca por dia</h2>
+      <p class="lead">Isca e cor para manhã, meio do dia e fim de tarde. A recomendação sai da previsão do tempo (chuva, nuvens, vento e pressão) e da cor e do nível da água, que o Oppen atualiza durante a viagem.</p>
+    </div>
+    <div class="days" id="planDays" role="group" aria-label="Escolher dia"></div>
+    <div id="planDay"></div>
+    <p class="plano-foot" id="planFoot"></p>
+  </div>
+</section>
+
+<!-- DADOS DO PLANO · o Oppen edita SÓ este bloco (JSON válido). Regras em oppen/skill-plano-pesca/SKILL.md -->
+<script id="plano-dados" type="application/json">
+{
+  "atualizado": "2026-10-30T14:30:00-04:00",
+  "por": "Oppen",
+  "local_padrao": {
+    "nome": "Foz do Rio Branco (AM)",
+    "lat": -1.4,
+    "lon": -61.98
+  },
+  "dias": {
+    "2026-10-26": {
+      "local": {
+        "nome": "Rio Negro, barco-hotel subindo (AM)",
+        "lat": -2.262,
+        "lon": -61.041
+      },
+      "agua_cor": "preta",
+      "nivel": "descendo",
+      "nota": "Tarde nublada, água escura e transparente (relato do Fausto). Superfície: Happy Popper 95 e Rocket cromada, toques curtos colado na galhada. Rio Negro descendo 8 cm/dia.",
+      "periodos": {},
+      "resultado": "Tarde e fim do dia perto de Novo Airão: Niva 64 cm, Barata açu 60 cm, Cacá 53 cm, Felipe açu 52 cm. 7 peixes com foto no placar."
+    },
+    "2026-10-27": {
+      "local": {
+        "nome": "Região de Novo Airão (AM), último ponto de pesca",
+        "lat": -2.093,
+        "lon": -61.155
+      },
+      "agua_cor": null,
+      "nivel": "descendo",
+      "nota": "Rio Negro descendo devagar, 6 cm/dia (Porto de Manaus 27/10). Tarde com pressão caindo: abaixo da superfície, toquinho curto rente à galhada (Nelson). \"Trabalha mais, desloca menos.\"",
+      "periodos": {},
+      "resultado": "12 peixes às 8h no Lago do Aturiá (Barco 3). Tarde em Novo Airão: J. Mazza açu 66 cm (novo líder), Botinho açu 63 e paca 54, Cacá 60, Birigui 60 e 54, Fausto paca 57 e borboleta 45. Barco 3 somou 12 peixes no dia."
+    },
+    "2026-10-28": {
+      "local": {
+        "nome": "Região de Novo Airão (AM), Lago do Aturiá",
+        "lat": -2.043,
+        "lon": -61.151
+      },
+      "agua_cor": null,
+      "nivel": "descendo",
+      "nota": "Tarde no Aturiá: volta para a superfície. Rio Negro em 16,55 m, descendo 4 cm (Porto de Manaus 28/10). Se recusar, desce um nível com toquinho curto. Líder do campeonato: Ricardo, açu 68 cm.",
+      "periodos": {
+        "manha": {
+          "isca": "Sará Sará 100",
+          "alternativa": "Happy Popper 95",
+          "cores": [
+            "Branco-bone",
+            "Natural"
+          ],
+          "como": "Chamadinha do Nelson: toques e parada de 2 a 4 s, colado na galhada. Repete o ponto quente do Aturiá, onde o Barco 3 fez 12 peixes às 8h com Niva na Sará Sará.",
+          "motivo": "Superfície aberta cedo e rio descendo devagar: peixe concentrado e ativo. Foi o que produziu cedo em 27/10."
+        },
+        "meio": {
+          "isca": "Curisco 90",
+          "alternativa": "BacaShad 13 cm",
+          "cores": [
+            "Natural",
+            "Branco-bone"
+          ],
+          "como": "Recolhimento contínuo com toques de ponta de vara, rente à galhada. Pressão caindo: peixe mais fundo, trabalho lento, pausa longa.",
+          "motivo": "Rio descendo devagar (16,55 m, -4 cm) e pressão caindo no meio do dia: desce um nível da superfície, como em 27/10."
+        },
+        "tarde": {
+          "isca": "Happy Popper 95",
+          "alternativa": "Sará Sará 100",
+          "cores": [
+            "Branco-bone",
+            "Natural"
+          ],
+          "como": "Chamadinha do Nelson: toques e parada de 2 a 4 s, colado na galhada. Insiste no ponto quente do Aturiá, que produziu cedo de novo. Se o peixe errar o bote, troca para Rocket com barulho.",
+          "motivo": "Fim de tarde volta para a superfície; rio descendo devagar (16,55 m, -4 cm) deixa o peixe concentrado e ativo na estrutura."
+        }
+      },
+      "resultado": ""
+    },
+    "2026-10-29": {
+      "local": null,
+      "agua_cor": null,
+      "nivel": "descendo",
+      "nota": "Rio Negro em 16,52 m (29/10), descendo 3 cm. Manhã e meio do dia foram de pressão caindo; fim de tarde volta para a superfície. Líder do campeonato: Ricardo, açu 68 cm.",
+      "periodos": {
+        "manha": {
+          "isca": "Sará Sará 100",
+          "alternativa": "Happy Popper 95",
+          "cores": [
+            "Branco-bone",
+            "Natural"
+          ],
+          "como": "Chamadinha do Nelson: toques e parada de 2 a 4 s, colado na galhada. Mantém o ponto do Aturiá que produziu bem cedo nos últimos 2 dias.",
+          "motivo": "Rio descendo devagar (16,55 m, -4 cm): peixe concentrado e ativo na estrutura. Superfície é o ponto de partida da manhã. Foi o que funcionou nos últimos 2 dias."
+        },
+        "meio": {
+          "isca": "Curisco 90",
+          "alternativa": "BacaShad 13 cm",
+          "cores": [
+            "Natural",
+            "Branco-bone"
+          ],
+          "como": "Recolhimento contínuo com toques de ponta de vara, rente à galhada. Trabalho lento com pausa longa. Se recusar, desce pro BacaShad 13 no fundo.",
+          "motivo": "Rio descendo devagar (16,52 m no 29/10, -3 cm). Meio do dia pede fundo/abaixo da superfície; pressão caindo à tarde favorece isca lenta."
+        },
+        "tarde": {
+          "isca": "Happy Popper 95",
+          "alternativa": "Sará Sará 100",
+          "cores": [
+            "Branco-bone",
+            "Natural"
+          ],
+          "como": "Chamadinha do Nelson: toques e parada de 2 a 4 s, colado na galhada. Fim de tarde volta para a superfície; rio descendo devagar deixa o peixe concentrado e ativo na estrutura.",
+          "motivo": "Rio Negro em 16,52 m no 29/10, descendo 3 cm. Fim de tarde é horário de superfície; últimos dias mostraram que o peixe ataca bem nesse horário."
+        }
+      },
+      "resultado": ""
+    },
+    "2026-10-30": {
+      "local": {
+        "nome": "Mauaru (AM)",
+        "lat": -1.40467,
+        "lon": -61.91994
+      },
+      "agua_cor": null,
+      "nivel": "descendo",
+      "nota": "Rio Negro em 16,50 m (30/10), descendo 2 cm. Barcos em Mauaru. Tarde: volta para a superfície na galhada. Lider do campeonato: Birigui, acu 71 cm.",
+      "periodos": {
+        "manha": {
+          "isca": "Curisco 90",
+          "alternativa": "BacaShad 13 cm",
+          "cores": [
+            "Natural",
+            "Branco-bone"
+          ],
+          "como": "Offset leve, recolhimento contínuo com toques de ponta de vara. Pausa longa. Trabalha mais, desloca menos.",
+          "motivo": "Repiquete (Rio Negro subindo 5 cm, 27,85 m no 30/10): água nova e fria, peixe fecha a boca e desce. Nada de chocalho (Nakamura)."
+        },
+        "meio": {
+          "isca": "Curisco 90",
+          "alternativa": "BacaShad 13 cm",
+          "cores": [
+            "Natural",
+            "Branco-bone"
+          ],
+          "como": "Offset leve, recolhimento continuo com toques de ponta de vara, rente a galhada. Pausa longa. Se recusar, desce pro BacaShad 13 cm no fundo.",
+          "motivo": "Meio do dia pede abaixo da superficie; rio descendo devagar (16,50 m, -2 cm) concentra o peixe na estrutura. Trabalha mais, desloca menos."
+        },
+        "tarde": {
+          "isca": "Sará Sará 100",
+          "alternativa": "Happy Popper 95",
+          "cores": [
+            "Branco-bone",
+            "Natural"
+          ],
+          "como": "Chamadinha do Nelson: toques e parada de 2 a 4 s, colado na galhada. Fim de tarde volta para a superfície.",
+          "motivo": "Tarde é horário de superfície; rio descendo devagar (16,50 m, -2 cm) concentra o peixe na estrutura e deixa ativo no fim do dia."
+        }
+      },
+      "resultado": ""
+    }
+  }
+}
+</script>
+
+<!-- ===== TRAJETO DA VIAGEM · mapa montado do bloco trajeto-dados (Oppen atualiza) ===== -->
+<section id="trajeto" class="sec alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="stamp" id="trajetoStamp"></span>
+      <h2>Trajeto da viagem</h2>
+      <p class="lead">A viagem contada no mapa: cada localização, foto e captura mandada durante a pescaria vira um ponto, com dia e hora. Toque num ponto da lista para ver no mapa.</p>
+    </div>
+    <div class="trajeto">
+      <div id="mapaTrajeto" role="region" aria-label="Mapa do trajeto da viagem"><div class="mapa-msg">Carregando o mapa…</div></div>
+      <div><ol class="paradas" id="paradas"></ol></div>
+    </div>
+  </div>
+</section>
+
+<!-- DADOS DO TRAJETO · o Oppen acrescenta 1 item em "pontos" por localização (JSON válido).
+     quando = data e hora local com fuso (Manaus -04:00, São Paulo -03:00) · modo = barco, voadeira, aviao, carro ou a pe
+     Exemplo: { "quando":"2026-10-25T13:40:00-04:00", "lat":-3.1, "lon":-60.0, "nome":"Píer da Ponta Negra, Manaus", "nota":"Embarque no barco-hotel", "modo":"carro" }
+     Foto e captura (opcionais): "foto":"img/traj-AAAAMMDD-HHMM.jpg", "mini":"img/traj-AAAAMMDD-HHMM-p.jpg",
+       "captura":{ "especie":"Tucunaré-açu", "tamanho_cm":62, "peso_kg":5.2, "isca":"Zig Zarinha", "cor":"branco-bone", "pescador":"Fausto" }
+     Use o script oppen/trajeto_ponto.py: ele reduz a foto, tira os dados escondidos dela e grava o ponto aqui. -->
+<script id="trajeto-dados" type="application/json">
+{
+  "atualizado": "2026-10-31T00:00:29-03:00",
+  "pontos": [
+    {
+      "quando": "2026-10-25T04:30:00-03:00",
+      "lat": -23.43786,
+      "lon": -46.48056,
+      "nome": "Aeroporto de Guarulhos (SP)",
+      "nota": "Encontro do grupo às 04:30, marcado pelo organizador, Richard Blanc. Entrega das camisetas e dos bilhetes, despacho de malas e tubos juntos. Voo às 06:55."
+    },
+    {
+      "quando": "2026-10-25T07:36:00-03:00",
+      "lat": -23.42391,
+      "lon": -46.47572,
+      "nome": "Aeroporto de Guarulhos · Terminal 2 (embarque)",
+      "nota": "Turma já na área de embarque, a caminho de Manaus."
+    },
+    {
+      "quando": "2026-10-25T10:43:00-03:00",
+      "lat": -15.87063,
+      "lon": -47.91877,
+      "nome": "Aeroporto de Brasília (escala)",
+      "nota": "Pouso em Brasília com 2h de atraso. Troca de avião para Manaus.",
+      "modo": "aviao"
+    },
+    {
+      "quando": "2026-10-25T19:38:00-03:00",
+      "lat": -15.8697,
+      "lon": -47.9172,
+      "nome": "Sala VIP do Aeroporto de Brasília",
+      "nota": "Turma confraternizando na Sala VIP enquanto espera o voo da noite para Manaus. Foto pedida pelo Fausto no grupo.",
+      "modo": "a pe",
+      "fotos": [
+        {
+          "foto": "img/traj-20261025-1938.jpg",
+          "mini": "img/traj-20261025-1938-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261025-1938.jpg",
+      "mini": "img/traj-20261025-1938-p.jpg"
+    },
+    {
+      "quando": "2026-10-25T23:45:00-04:00",
+      "lat": -3.0316,
+      "lon": -60.0456,
+      "nome": "Aeroporto de Manaus (chegada)",
+      "nota": "Chegada em Manaus depois de um dia inteiro de atraso da LATAM. Amanhã é dia de barco.",
+      "modo": "aviao"
+    },
+    {
+      "quando": "2026-10-26T00:49:00-04:00",
+      "lat": -3.075704,
+      "lon": -60.129825,
+      "nome": "Barco-hotel na Ponta Negra, Manaus · embarque",
+      "nota": "Turma inteira no barco, de madrugada, depois de um dia de atraso. Amanhã começa a subida do Rio Negro.",
+      "modo": "carro",
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-0049.jpg",
+          "mini": "img/traj-20261026-0049-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-0049.jpg",
+      "mini": "img/traj-20261026-0049-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T01:27:00-04:00",
+      "lat": -3.0757,
+      "lon": -60.12982,
+      "nome": "Deck do barco-hotel, Ponta Negra, Manaus",
+      "nota": "Oficialmente no barco: turma no deck na primeira noite a bordo, com as luzes de Manaus ao fundo.",
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-0127.jpg",
+          "mini": "img/traj-20261026-0127-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-0127.jpg",
+      "mini": "img/traj-20261026-0127-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T12:30:08-04:00",
+      "lat": -2.26247,
+      "lon": -61.04061,
+      "nome": "Barco-hotel subindo o Rio Negro",
+      "nota": "Foto oficial dos pescadores a bordo, primeiro dia de pesca.",
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1230.jpg",
+          "mini": "img/traj-20261026-1230-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1230.jpg",
+      "mini": "img/traj-20261026-1230-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T12:30:26-04:00",
+      "lat": -2.26247,
+      "lon": -61.04061,
+      "nome": "Barco-hotel subindo o Rio Negro",
+      "nota": "Mais uma foto da turma de pescadores no barco.",
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1230-2.jpg",
+          "mini": "img/traj-20261026-1230-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1230-2.jpg",
+      "mini": "img/traj-20261026-1230-2-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T18:07:54-04:00",
+      "lat": -2.03349,
+      "lon": -61.15073,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré",
+        "tamanho_cm": 64,
+        "pescador": "Niva"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1807.jpg",
+          "mini": "img/traj-20261026-1807-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1807.jpg",
+      "mini": "img/traj-20261026-1807-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T18:07:55-04:00",
+      "lat": -2.03349,
+      "lon": -61.15073,
+      "nome": "Novo Airão (AM)",
+      "nota": "Primeiro do dia, tamanho aproximado, não medido",
+      "captura": {
+        "especie": "Tucunaré-paca",
+        "tamanho_cm": 45,
+        "pescador": "Fausto"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1807-2.jpg",
+          "mini": "img/traj-20261026-1807-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1807-2.jpg",
+      "mini": "img/traj-20261026-1807-2-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T19:16:39-04:00",
+      "lat": -2.09284,
+      "lon": -61.15533,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré",
+        "tamanho_cm": 53,
+        "pescador": "Cacá"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1916.jpg",
+          "mini": "img/traj-20261026-1916-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1916.jpg",
+      "mini": "img/traj-20261026-1916-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T19:18:01-04:00",
+      "lat": -2.09284,
+      "lon": -61.15533,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 60,
+        "pescador": "Barata"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1918.jpg",
+          "mini": "img/traj-20261026-1918-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1918.jpg",
+      "mini": "img/traj-20261026-1918-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T19:18:02-04:00",
+      "lat": -2.09284,
+      "lon": -61.15533,
+      "nome": "Novo Airão (AM)",
+      "nota": "Barata com o tucunaré-açu de 60 cm",
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1918-2.jpg",
+          "mini": "img/traj-20261026-1918-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1918-2.jpg",
+      "mini": "img/traj-20261026-1918-2-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T19:29:25-04:00",
+      "lat": -2.09284,
+      "lon": -61.15533,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 52,
+        "pescador": "Felipe"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1929.jpg",
+          "mini": "img/traj-20261026-1929-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1929.jpg",
+      "mini": "img/traj-20261026-1929-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T19:29:26-04:00",
+      "lat": -2.09284,
+      "lon": -61.15533,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "pescador": "Felipe"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1929-2.jpg",
+          "mini": "img/traj-20261026-1929-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1929-2.jpg",
+      "mini": "img/traj-20261026-1929-2-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T19:30:10-04:00",
+      "lat": -2.09284,
+      "lon": -61.15533,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "pescador": "Felipe"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1930.jpg",
+          "mini": "img/traj-20261026-1930-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1930.jpg",
+      "mini": "img/traj-20261026-1930-p.jpg"
+    },
+    {
+      "quando": "2026-10-26T19:31:00-04:00",
+      "lat": -2.09284,
+      "lon": -61.15533,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré",
+        "pescador": "Felipe"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261026-1931.jpg",
+          "mini": "img/traj-20261026-1931-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261026-1931.jpg",
+      "mini": "img/traj-20261026-1931-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T08:00:00-04:00",
+      "lat": -2.04315,
+      "lon": -61.15122,
+      "nome": "Lago Do Aturia (AM)",
+      "nota": "Barco 3 já com 12 peixes às 8h, Niva recordista. Tripla perto do barco; o snap do Niva estourou e o peixe saiu pulando com a Sará Sará na boca (o Pastor viu)."
+    },
+    {
+      "quando": "2026-10-27T18:07:59-04:00",
+      "lat": -2.04576,
+      "lon": -61.23518,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 63,
+        "pescador": "Botinho"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1807.jpg",
+          "mini": "img/traj-20261027-1807-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1807.jpg",
+      "mini": "img/traj-20261027-1807-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:08:00-04:00",
+      "lat": -2.04576,
+      "lon": -61.23518,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-paca",
+        "tamanho_cm": 54,
+        "pescador": "Botinho"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1808.jpg",
+          "mini": "img/traj-20261027-1808-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1808.jpg",
+      "mini": "img/traj-20261027-1808-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:10:01-04:00",
+      "lat": -2.04315,
+      "lon": -61.15122,
+      "nome": "Almoço do Barco 3",
+      "nota": "Almoço do Fausto e do Niva no rio (foto 1 de 4)",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1810.jpg",
+          "mini": "img/traj-20261027-1810-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1810.jpg",
+      "mini": "img/traj-20261027-1810-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:10:01-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Almoço",
+      "nota": "Almoço do Fausto e do Niva na beira do rio",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1810-5.jpg",
+          "mini": "img/traj-20261027-1810-5-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1810-5.jpg",
+      "mini": "img/traj-20261027-1810-5-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:10:02-04:00",
+      "lat": -2.04315,
+      "lon": -61.15122,
+      "nome": "Almoço do Barco 3",
+      "nota": "Almoço do Fausto e do Niva no rio (foto 2 de 4)",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1810-2.jpg",
+          "mini": "img/traj-20261027-1810-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1810-2.jpg",
+      "mini": "img/traj-20261027-1810-2-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:10:02-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Almoço",
+      "nota": "Almoço do Fausto e do Niva, selfie com o piloteiro",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1810-6.jpg",
+          "mini": "img/traj-20261027-1810-6-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1810-6.jpg",
+      "mini": "img/traj-20261027-1810-6-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:10:03-04:00",
+      "lat": -2.04315,
+      "lon": -61.15122,
+      "nome": "Almoço do Barco 3",
+      "nota": "Almoço do Fausto e do Niva no rio (foto 3 de 4)",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1810-3.jpg",
+          "mini": "img/traj-20261027-1810-3-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1810-3.jpg",
+      "mini": "img/traj-20261027-1810-3-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:10:03-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Almoço",
+      "nota": "Parada do almoço, barco ancorado na pedra",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1810-8.jpg",
+          "mini": "img/traj-20261027-1810-8-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1810-8.jpg",
+      "mini": "img/traj-20261027-1810-8-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:10:04-04:00",
+      "lat": -2.04315,
+      "lon": -61.15122,
+      "nome": "Almoço do Barco 3",
+      "nota": "Almoço do Fausto e do Niva no rio (foto 4 de 4)",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1810-4.jpg",
+          "mini": "img/traj-20261027-1810-4-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1810-4.jpg",
+      "mini": "img/traj-20261027-1810-4-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:10:04-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Almoço",
+      "nota": "Ceviche sendo preparado no almoço",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1810-7.jpg",
+          "mini": "img/traj-20261027-1810-7-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1810-7.jpg",
+      "mini": "img/traj-20261027-1810-7-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:42:30-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 60,
+        "pescador": "Cacá"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1842.jpg",
+          "mini": "img/traj-20261027-1842-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1842.jpg",
+      "mini": "img/traj-20261027-1842-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:53:45-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 46,
+        "pescador": "Ricardo"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1853.jpg",
+          "mini": "img/traj-20261027-1853-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1853.jpg",
+      "mini": "img/traj-20261027-1853-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:58:30-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 66,
+        "pescador": "J. Mazza"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1858.jpg",
+          "mini": "img/traj-20261027-1858-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1858.jpg",
+      "mini": "img/traj-20261027-1858-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T18:58:31-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "nota": "Prova na régua do açu de 66 cm do J. Mazza",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1858-2.jpg",
+          "mini": "img/traj-20261027-1858-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1858-2.jpg",
+      "mini": "img/traj-20261027-1858-2-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T19:06:04-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-borboleta",
+        "tamanho_cm": 45,
+        "pescador": "Fausto"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1906.jpg",
+          "mini": "img/traj-20261027-1906-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1906.jpg",
+      "mini": "img/traj-20261027-1906-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T19:07:44-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "nota": "Tucunaré de 69 cm pego pelo piloteiro, fora do campeonato",
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1907.jpg",
+          "mini": "img/traj-20261027-1907-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1907.jpg",
+      "mini": "img/traj-20261027-1907-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T19:12:41-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré-paca",
+        "tamanho_cm": 55,
+        "pescador": "Fausto"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1912.jpg",
+          "mini": "img/traj-20261027-1912-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1912.jpg",
+      "mini": "img/traj-20261027-1912-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T19:13:55-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "nota": "Paca de 57 cm na régua, corrige os 55 cm",
+      "captura": {
+        "especie": "Tucunaré-paca",
+        "tamanho_cm": 57,
+        "pescador": "Fausto"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-1913.jpg",
+          "mini": "img/traj-20261027-1913-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-1913.jpg",
+      "mini": "img/traj-20261027-1913-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T21:40:30-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré",
+        "tamanho_cm": 60,
+        "pescador": "Birigui"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-2140.jpg",
+          "mini": "img/traj-20261027-2140-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-2140.jpg",
+      "mini": "img/traj-20261027-2140-p.jpg"
+    },
+    {
+      "quando": "2026-10-27T21:41:45-04:00",
+      "lat": -2.03018,
+      "lon": -61.15292,
+      "nome": "Novo Airão (AM)",
+      "captura": {
+        "especie": "Tucunaré",
+        "tamanho_cm": 54,
+        "pescador": "Birigui"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261027-2141.jpg",
+          "mini": "img/traj-20261027-2141-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261027-2141.jpg",
+      "mini": "img/traj-20261027-2141-p.jpg"
+    },
+    {
+      "quando": "2026-10-28T05:00:00-04:00",
+      "lat": -1.64413,
+      "lon": -61.47014,
+      "nome": "Barco hotel ancorado (nova parada)",
+      "nota": "Nova parada do barco hotel em 28/10. Daqui saem os botes para pescar. Local enviado pelo Fausto no grupo.",
+      "modo": "barco"
+    },
+    {
+      "quando": "2026-10-28T18:03:00-04:00",
+      "lat": -1.64413,
+      "lon": -61.47014,
+      "nome": "Perto do barco hotel",
+      "nota": "Medida lida na régua da foto (68 cm), regra oficial do campeonato definida pelo Fausto em 28/10.",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "pescador": "Ricardo",
+        "tamanho_cm": 68
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261028-1803.jpg",
+          "mini": "img/traj-20261028-1803-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261028-1803-2.jpg",
+          "mini": "img/traj-20261028-1803-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261028-1803.jpg",
+      "mini": "img/traj-20261028-1803-p.jpg"
+    },
+    {
+      "quando": "2026-10-28T18:18:00-04:00",
+      "lat": -1.64413,
+      "lon": -61.47014,
+      "nome": "Perto do barco hotel",
+      "nota": "Medida lida na régua da foto (58 cm), regra oficial do campeonato definida pelo Fausto em 28/10.",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "pescador": "Ricardo",
+        "tamanho_cm": 58
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261028-1818.jpg",
+          "mini": "img/traj-20261028-1818-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261028-1818.jpg",
+      "mini": "img/traj-20261028-1818-p.jpg"
+    },
+    {
+      "quando": "2026-10-28T18:36:00-04:00",
+      "lat": -1.64413,
+      "lon": -61.47014,
+      "nome": "Perto do barco hotel",
+      "nota": "Medida lida na régua da foto (63 cm), regra oficial do campeonato definida pelo Fausto em 28/10.",
+      "captura": {
+        "especie": "Tucunaré",
+        "pescador": "Bianchi",
+        "tamanho_cm": 63
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261028-1836.jpg",
+          "mini": "img/traj-20261028-1836-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261028-1836.jpg",
+      "mini": "img/traj-20261028-1836-p.jpg"
+    },
+    {
+      "quando": "2026-10-28T18:52:00-04:00",
+      "lat": -1.64413,
+      "lon": -61.47014,
+      "nome": "Perto do barco hotel",
+      "nota": "Tucunaré do Fausto, sem medida (nao conta no campeonato).",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "pescador": "Fausto"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261028-1852.jpg",
+          "mini": "img/traj-20261028-1852-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261028-1852.jpg",
+      "mini": "img/traj-20261028-1852-p.jpg"
+    },
+    {
+      "quando": "2026-10-28T19:39:00-04:00",
+      "lat": -1.55319,
+      "lon": -61.55282,
+      "nome": "Vila Nova (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 52,
+        "pescador": "Birigui"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261028-1939.jpg",
+          "mini": "img/traj-20261028-1939-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261028-1939.jpg",
+      "mini": "img/traj-20261028-1939-p.jpg"
+    },
+    {
+      "quando": "2026-10-28T19:48:00-04:00",
+      "lat": -1.64413,
+      "lon": -61.47014,
+      "nome": "Barco hotel ancorado",
+      "nota": "Piranha capturada ao lado do barco hotel",
+      "captura": {
+        "especie": "Piranha",
+        "pescador": "Fausto"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261028-1948.jpg",
+          "mini": "img/traj-20261028-1948-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261028-1948.jpg",
+      "mini": "img/traj-20261028-1948-p.jpg"
+    },
+    {
+      "quando": "2026-10-28T20:08:00-04:00",
+      "lat": -1.64413,
+      "lon": -61.47014,
+      "nome": "Barcelos (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 65,
+        "pescador": "Ricardo"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261028-2008.jpg",
+          "mini": "img/traj-20261028-2008-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261028-2008-2.jpg",
+          "mini": "img/traj-20261028-2008-2-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261028-2008-3.jpg",
+          "mini": "img/traj-20261028-2008-3-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261028-2008.jpg",
+      "mini": "img/traj-20261028-2008-p.jpg"
+    },
+    {
+      "quando": "2026-10-29T07:04:37-04:00",
+      "lat": -1.4046,
+      "lon": -61.91987,
+      "nome": "Barco Hotel Ancorado",
+      "nota": "Parada do barco hotel - base dos botes de pesca"
+    },
+    {
+      "quando": "2026-10-29T07:20:00-04:00",
+      "lat": -1.32643,
+      "lon": -61.94867,
+      "nome": "Pesca da manhã · Barco 2",
+      "nota": "Botinho avisou: 7:20 da manhã. Medida informada e conferida na régua.",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 51,
+        "pescador": "Botinho"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261029-0720.jpg",
+          "mini": "img/traj-20261029-0720-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-0720-2.jpg",
+          "mini": "img/traj-20261029-0720-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261029-0720.jpg",
+      "mini": "img/traj-20261029-0720-p.jpg"
+    },
+    {
+      "quando": "2026-10-29T07:25:00-04:00",
+      "lat": -1.32547,
+      "lon": -61.96738,
+      "nome": "Pesca da manhã · Barco 2",
+      "nota": "Horário aproximado (manhã de 29/10).",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 57,
+        "pescador": "Botinho"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261029-0725.jpg",
+          "mini": "img/traj-20261029-0725-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261029-0725.jpg",
+      "mini": "img/traj-20261029-0725-p.jpg"
+    },
+    {
+      "quando": "2026-10-29T07:30:00-04:00",
+      "lat": -1.31907,
+      "lon": -61.97663,
+      "nome": "Pesca da manhã · Barco 2",
+      "nota": "Horário aproximado (manhã de 29/10).",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 50,
+        "pescador": "Botinho"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261029-0730.jpg",
+          "mini": "img/traj-20261029-0730-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-0730-2.jpg",
+          "mini": "img/traj-20261029-0730-2-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261029-0730.jpg",
+      "mini": "img/traj-20261029-0730-p.jpg"
+    },
+    {
+      "quando": "2026-10-29T20:43:00-04:00",
+      "lat": -1.32724,
+      "lon": -61.95372,
+      "nome": "Pesca do dia · Barco 2",
+      "nota": "Hora do envio no grupo; medida informada e conferida na régua.",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 51,
+        "pescador": "Birigui"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261029-2043.jpg",
+          "mini": "img/traj-20261029-2043-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261029-2043.jpg",
+      "mini": "img/traj-20261029-2043-p.jpg"
+    },
+    {
+      "quando": "2026-10-29T21:21:00-04:00",
+      "lat": -1.40467,
+      "lon": -61.91994,
+      "nome": "Perto do barco hotel",
+      "nota": "Medida lida na régua da foto (63 cm), regra oficial.",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 63,
+        "pescador": "Bianchi"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261029-2121.jpg",
+          "mini": "img/traj-20261029-2121-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261029-2121.jpg",
+      "mini": "img/traj-20261029-2121-p.jpg"
+    },
+    {
+      "quando": "2026-10-29T21:28:00-04:00",
+      "lat": -1.40467,
+      "lon": -61.91994,
+      "nome": "Fotos do dia · Barco 7",
+      "nota": "Fotos enviadas pelo Bianchi sem medida: entram no mapa, nao no ranking.",
+      "fotos": [
+        {
+          "foto": "img/traj-20261029-2128.jpg",
+          "mini": "img/traj-20261029-2128-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2128-2.jpg",
+          "mini": "img/traj-20261029-2128-2-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2128-3.jpg",
+          "mini": "img/traj-20261029-2128-3-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2128-4.jpg",
+          "mini": "img/traj-20261029-2128-4-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261029-2128.jpg",
+      "mini": "img/traj-20261029-2128-p.jpg"
+    },
+    {
+      "quando": "2026-10-29T21:55:00-04:00",
+      "lat": -1.40467,
+      "lon": -61.91994,
+      "nome": "Perto do barco hotel",
+      "nota": "Tucunaré-açu do Beavis, 70,6 cm na régua (foto enviada pelo Leandro e pelo Mazza). Novo líder do campeonato.",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 70.6,
+        "pescador": "Beavis"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261029-2155.jpg",
+          "mini": "img/traj-20261029-2155-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2155-2.jpg",
+          "mini": "img/traj-20261029-2155-2-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2155-3.jpg",
+          "mini": "img/traj-20261029-2155-3-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261029-2155.jpg",
+      "mini": "img/traj-20261029-2155-p.jpg"
+    },
+    {
+      "quando": "2026-10-29T22:18:00-04:00",
+      "lat": -1.40467,
+      "lon": -61.91994,
+      "nome": "Festa de luau · Barco hotel",
+      "nota": "Luau da turma na praia, ao lado do barco hotel (29/10).",
+      "fotos": [
+        {
+          "foto": "img/traj-20261029-2218.jpg",
+          "mini": "img/traj-20261029-2218-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2218-2.jpg",
+          "mini": "img/traj-20261029-2218-2-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2218-3.jpg",
+          "mini": "img/traj-20261029-2218-3-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2218-4.jpg",
+          "mini": "img/traj-20261029-2218-4-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2218-5.jpg",
+          "mini": "img/traj-20261029-2218-5-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2218-6.jpg",
+          "mini": "img/traj-20261029-2218-6-p.jpg"
+        },
+        {
+          "foto": "img/traj-20261029-2218-7.jpg",
+          "mini": "img/traj-20261029-2218-7-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261029-2218.jpg",
+      "mini": "img/traj-20261029-2218-p.jpg"
+    },
+    {
+      "quando": "2026-10-30T06:56:23-04:00",
+      "lat": -1.40467,
+      "lon": -61.91994,
+      "nome": "Mauaru (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 70.6,
+        "pescador": "Birigui"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261030-0656.jpg",
+          "mini": "img/traj-20261030-0656-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261030-0656.jpg",
+      "mini": "img/traj-20261030-0656-p.jpg"
+    },
+    {
+      "quando": "2026-10-30T07:01:46-04:00",
+      "lat": -1.40467,
+      "lon": -61.91994,
+      "nome": "Mauaru (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 71.0,
+        "pescador": "Birigui"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261030-0701.jpg",
+          "mini": "img/traj-20261030-0701-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261030-0701.jpg",
+      "mini": "img/traj-20261030-0701-p.jpg"
+    },
+    {
+      "quando": "2026-10-30T21:43:00-04:00",
+      "lat": -1.40467,
+      "lon": -61.91994,
+      "nome": "Mauaru (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 60,
+        "pescador": "Fausto"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261030-2143.jpg",
+          "mini": "img/traj-20261030-2143-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261030-2143.jpg",
+      "mini": "img/traj-20261030-2143-p.jpg"
+    },
+    {
+      "quando": "2026-10-30T23:57:25-04:00",
+      "lat": -1.40467,
+      "lon": -61.91994,
+      "nome": "Mauaru (AM)",
+      "captura": {
+        "especie": "Tucunaré-açu",
+        "tamanho_cm": 60,
+        "pescador": "Fausto"
+      },
+      "fotos": [
+        {
+          "foto": "img/traj-20261030-2357.jpg",
+          "mini": "img/traj-20261030-2357-p.jpg"
+        }
+      ],
+      "foto": "img/traj-20261030-2357.jpg",
+      "mini": "img/traj-20261030-2357-p.jpg"
+    }
+  ]
+}
+</script>
+
+<!-- ===== CAMPEONATO · lê as capturas do bloco trajeto-dados + barcos do bloco campeonato-dados ===== -->
+<section id="campeonato" class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="stamp" id="campStamp"></span>
+      <h2>Campeonato do maior tucunaré</h2>
+      <p class="lead">Ganha o barco que pegar o maior tucunaré da viagem, medido na régua. Vale de segunda 26 a sexta 30/out.</p>
+    </div>
+    <ol class="camp-regras">
+      <li><span><b>Só tucunaré.</b> Qualquer tipo de tucunaré vale; outras espécies não entram.</span></li>
+      <li><span><b>Medida na régua, em centímetros.</b> Ganha o mais comprido.</span></li>
+      <li><span><b>Foto obrigatória:</b> o peixe com o pescador e a régua aparecendo. Sem foto ou sem régua, não vale.</span></li>
+      <li><span><b>Mande a foto no grupo</b> com a medida. Ela entra aqui e no Trajeto pelo Oppen.</span></li>
+    </ol>
+    <div class="premio">
+      <div><b>Piloteiro do barco campeão</b>Prêmio em dinheiro</div>
+      <div><b>Dupla do barco campeão</b>Troféu</div>
+    </div>
+    <div id="campCorpo"></div>
+  </div>
+</section>
+
+<!-- DADOS DO CAMPEONATO · o Oppen preenche os barcos no primeiro dia (JSON válido).
+     As capturas NÃO ficam aqui: vêm do bloco trajeto-dados (captura com especie, tamanho_cm, pescador e foto).
+     "barcos": [ { "nome":"Barco 1", "dupla":["Fulano","Beltrano"], "piloteiro":"Sicrano" } ]
+     "fora": capturas que não valem, pelo "quando" do ponto: [ { "quando":"2026-10-26T07:10:00-04:00", "motivo":"foto sem régua" } ]
+     "encerrado": true só depois do último dia de pesca (30/out à noite). Ver oppen/skill-campeonato/SKILL.md -->
+<script id="campeonato-dados" type="application/json">
+{
+  "atualizado": "2026-10-30T21:45:00-04:00",
+  "barcos": [
+    {
+      "nome": "Barco 1",
+      "dupla": [
+        "Blanco",
+        "Ricardo"
+      ],
+      "piloteiro": "Borracha"
+    },
+    {
+      "nome": "Barco 2",
+      "dupla": [
+        "Birigui",
+        "Botinho"
+      ],
+      "piloteiro": "Guerreiro"
+    },
+    {
+      "nome": "Barco 3",
+      "dupla": [
+        "Fausto",
+        "Niva"
+      ],
+      "piloteiro": "Pastor"
+    },
+    {
+      "nome": "Barco 4",
+      "dupla": [
+        "Delio",
+        "Beavis"
+      ],
+      "piloteiro": "Marcos"
+    },
+    {
+      "nome": "Barco 5",
+      "dupla": [
+        "Felipe",
+        "Cacá"
+      ],
+      "piloteiro": "Magrão"
+    },
+    {
+      "nome": "Barco 6",
+      "dupla": [
+        "Barata",
+        "Fanti"
+      ],
+      "piloteiro": "Rallison"
+    },
+    {
+      "nome": "Barco 7",
+      "dupla": [
+        "Glauco",
+        "Bianchi"
+      ],
+      "piloteiro": "Jefferson"
+    },
+    {
+      "nome": "Barco 8",
+      "dupla": [
+        "J. Mazza",
+        "Sidnei"
+      ],
+      "piloteiro": "Júlio"
+    }
+  ],
+  "fora": [],
+  "encerrado": true,
+  "contagem": [
+    {
+      "quando": "2026-10-27T19:14:49-04:00",
+      "pescador": "Fausto",
+      "qtd": -1
+    },
+    {
+      "quando": "2026-10-30T05:59:57-04:00",
+      "pescador": "Birigui",
+      "qtd": 1,
+      "especie": "Tucunaré-açu"
+    },
+    {
+      "quando": "2026-10-30T06:04:37-04:00",
+      "pescador": "Birigui",
+      "qtd": 1,
+      "especie": "Tucunaré-açu"
+    }
+  ]
+}
+</script>
+
+<!-- ========================================================== -->
+<!-- RELATÓRIO · reescrito a cada relatório (mensal, depois diário) -->
+<!-- ========================================================== -->
+<section id="relatorio-mensal" class="sec" data-versao="2026-10-24">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="stamp" data-fresh="stamp">Relatório diário de 24/out/2026</span>
+      <h2>Como estão os rios</h2>
+    </div>
+    <p class="report-lead">O Rio Negro segue descendo <b>devagar e estável</b>, de 7 a 8 cm por dia: o melhor sinal para a pesca. Manaus marcou <b>16,90 m em 23/out</b> e a projeção para o embarque é de <b>16,7 a 16,8 m</b>: baixo, mas navegável. Barcelos segue estável. O Rio Branco segue seco e fora. Falta <b>1 dia</b>.</p>
+
+    <div class="rivers">
+      <article class="river">
+        <div class="river-head"><h3>Rio Negro</h3><span class="tag ok">Navegável · plano A</span></div>
+        <div class="river-big">16,90 m<small>Manaus, 23/out</small></div>
+        <p>Desceu 53 cm em 7 dias (17,43 m em 16/out), ritmo de 7 a 8 cm por dia nos últimos 3 dias. O SGB diz que segue dentro do esperado para a época (42º boletim, 20/out). Barcelos estável.</p>
+        <details class="more-in"><summary>Ver todos os números</summary>
+        <dl class="facts">
+          <div><dt>Projeção para 25/out</dt><dd class="hl">16,7 a 16,8 m</dd></div>
+          <div><dt>Projeção para 31/out</dt><dd>16,2 a 16,6 m</dd></div>
+          <div><dt>Comparado a 2024 (ano recorde), mesma data</dt><dd>mais de 4,9 m acima</dd></div>
+          <div><dt>Barcelos, 20/out</dt><dd>4,01 m · estável na semana</dd></div>
+          <div><dt>São Gabriel da Cachoeira, 20/out</dt><dd>8,16 m · provável fim da vazante</dd></div>
+          <div><dt>Alerta de vazante do SGB, 31/out</dt><dd>de menos de 13 m a 16,3 m</dd></div>
+          <div><dt>Mínima recorde em Manaus</dt><dd>12,13 m (03/11/2024)</dd></div>
+        </dl>
+        </details>
+      </article>
+      <article class="river">
+        <div class="river-head"><h3>Rio Branco</h3><span class="tag bad">Seco · descartado</span></div>
+        <div class="river-big">0,53 m<small>Boa Vista, 23/out</small></div>
+        <p>Entre os níveis mais baixos já registrados para a época; Caracaraí oscila em 1,03 m (23/out). SGB prevê queda em 15 dias. Barco-hotel não navega.</p>
+        <details class="more-in"><summary>Ver todos os números</summary>
+        <dl class="facts">
+          <div><dt>Caracaraí, 23/out</dt><dd class="bad">1,03 m</dd></div>
+          <div><dt>Em 20/out (Boa Vista / Caracaraí)</dt><dd>0,51 / 0,92 m</dd></div>
+          <div><dt>Chuva em outubro (até 22/out)</dt><dd>14,1 mm na bacia; 12,2 mm previstos em 7 dias (SGB)</dd></div>
+          <div><dt>Previsão do SGB</dt><dd>queda gradual nos próximos 15 dias</dd></div>
+        </dl>
+        </details>
+      </article>
+    </div>
+
+    <details class="more">
+      <summary>Ver relatório completo: o que mudaria a decisão, avisos, lua e fontes</summary>
+    <div class="cols">
+      <div>
+        <h3>O que faria a decisão mudar</h3>
+        <p class="muted small" style="margin-bottom:10px">Se qualquer um destes acontecer, o relatório diário avisa.</p>
+        <ul class="plain">
+          <li>Manaus abaixo de <b>15,0 m</b> antes de 25/out, ou voltando a descer mais de <b>15 cm por dia</b>.</li>
+          <li>Barcelos abaixo de <b>3,0 m</b> (hoje perto de 4,0 m).</li>
+          <li>Mais de <b>40 mm de chuva em 48 h</b> no alto Rio Negro (o rio pode voltar a subir).</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Avisos deste relatório</h3>
+        <ul class="plain">
+          <li><span class="tag warn">Vento</span>Rajada de 42 km/h na foz e 45 km/h em Barcelos em 28/10; até 55 km/h em Barcelos em 30/10. Cuidado na travessia de lancha, margem abrigada e arremesso a favor do vento.</li>
+          <li><span class="tag ok">Chuva</span>Perdeu força: no máximo 3,6 mm por dia na foz durante a viagem. No alto Negro, São Gabriel soma 13 mm em 48 h, longe do gatilho de 40 mm. Risco de repiquete baixo.</li>
+          <li><span class="tag warn">Seca</span>Bancos de areia na travessia de balsas em Manaus. Defesa Civil do Amazonas manteve o alerta em Barcelos, Novo Airão, Santa Isabel, São Gabriel e Manaus.</li>
+          <li><span class="tag ok">Régua do Porto</span>Manaus 16,90 m em 23/out (-7 cm), terceiro dia no mesmo ritmo. Sem boletim novo do SGB: Barcelos 4,01 m estável (20/out).</li>
+          <li><span class="tag ok">Lado bom</span>Pressão estável (1008 a 1010 hPa), sem frente fria e rio sem repiquete. Água preta e rio baixo concentram o tucunaré em poços, barrancos e bocas de igarapé.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div>
+        <h3>Lua cheia em 26/out, 01h11</h3>
+        <p>A viagem começa no pico da lua cheia (100% de luz em 25/out) e termina com 63% em 31/out.</p>
+        <ul class="plain" style="margin-top:12px">
+          <li><b>26/out, entardecer (18:00 às 19:30).</b> A lua nasce colada no pôr do sol.</li>
+          <li><b>30/out, amanhecer (05:45 às 08:00).</b> A lua passa no alto junto com o nascer do sol.</li>
+          <li><b>26 a 28/out, manhã cedo (06:00 às 09:00).</b> No sol a pino desses dias, soft e jig, não zara.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Mudou desde 23/out</h3>
+        <ul class="plain">
+          <li>Régua do Porto: Manaus <b>16,90 m</b> em 23/out (-7 cm).</li>
+          <li>Rio Branco pelo 22º boletim (23/out): Boa Vista <b>0,53 m</b> e Caracaraí 1,03 m, oscilando.</li>
+          <li>Projeção para 25/out passou de 16,7-16,9 m para <b>16,7-16,8 m</b>. 31/out segue 16,2-16,6 m.</li>
+          <li>A chuva de 29/out quase sumiu: 29/out subiu de 62 para <b>68</b>. 27/out segue o melhor dia (<b>83</b>). Nota média: <b>74</b>. Confiança segue <b>alta</b>.</li>
+        </ul>
+        <p class="muted small" style="margin-top:10px">Como a projeção foi feita: 16,90 m em 23/out (régua do Porto), descendo de 4 a 9 cm por dia até a viagem. Boletins usados: 42º Amazonas (20/out, sem boletim novo) e 22º Branco (23/out).</p>
+      </div>
+    </div>
+
+    <details class="fontes">
+      <summary>Fontes consultadas</summary>
+      <ul>
+        <li><a href="https://portodemanaus.com.br/nivel-do-rio-negro/" target="_blank" rel="noopener">Porto de Manaus · leitura diária do Rio Negro (16,90 m em 23/out)</a></li>
+        <li><a href="https://www.sgb.gov.br/sace/amazonas/ultimo_boletim.php" target="_blank" rel="noopener">SGB · 42º Boletim da Bacia do Amazonas (20/out)</a></li>
+        <li><a href="https://www.sgb.gov.br/w/rio-branco-registra-niveis-minimos-para-o-periodo-em-boa-vista-e-caracarai-em-roraima-1" target="_blank" rel="noopener">SGB · 22º Boletim da Bacia do Rio Branco (23/out)</a></li>
+        <li><a href="https://www.sgb.gov.br/sala-de-imprensa/-/asset_publisher/ujyx/content/alerta-de-vazante-analise-do-cenario-indica-que-rio-negro-em-manaus-pode-ter-cotas-entre-12-31-m-e-16-50-m-no-pico-da-seca" target="_blank" rel="noopener">SGB · Alerta de Vazante do Rio Negro (01/set)</a></li>
+        <li><a href="https://aam.org.br/estiagem-avanca-no-amazonas-e-29-municipios-estao-em-situacao-de-emergencia/" target="_blank" rel="noopener">AAM · Estiagem: 29 municípios em emergência (08/out)</a></li>
+        <li><a href="https://amazonas1.com.br/rio-negro-cai-para-1792-metros-e-dificulta-travessia-de-balsas/" target="_blank" rel="noopener">Amazonas1 · Rio Negro cai para 17,92 m e dificulta travessia de balsas (09/out)</a></li>
+        <li><a href="https://open-meteo.com/en/docs/climate-api" target="_blank" rel="noopener">Open-Meteo · previsão do tempo</a></li>
+      </ul>
+    </details>
+    </details>
+  </div>
+</section>
+
+<!-- ===== ISCAS · catálogo em ISCAS no script ===== -->
+<section id="iscas" class="sec alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Iscas</h2>
+      <p class="lead">Água preta transparente pede <b>branco-bone, natural e cromada</b>. Cor forte só de reserva. Quantidades para 6 dias, com 20% de folga para perdas.</p>
+    </div>
+
+    <h3 style="margin-bottom:6px">Prioridade nesta viagem</h3>
+    <ul class="prio prioridades">
+      <li><span class="tag ok">Alta</span><p><b>Superfície de 12 a 14 cm para o açu:</b> Rocket 140 com água picada e chamando na galhada; Sará Sará e zara grande com água calma. Branco-bone, natural, cromada. A linha Nakamura feita para açu é toda de 12 a 14 cm.</p></li>
+      <li><span class="tag ok">Alta</span><p><b>Jig de 1/2 oz vermelho e amarelo + BacaShad 17 cm</b> em poço e boca de lago, recolhendo rápido. O meio do dia rende: o açu marcado pela pesquisa da IGFA come mais das 9h às 15h em dia quente.</p></li>
+      <li><span class="tag warn">Média</span><p><b>Iscas de 9 a 10 cm</b> (Zig Zarinha, Jumping Stick, Happy Popper): quando o peixe estiver manhoso, pressionado ou depois de mudança de tempo. "Prefere uma isca menor" (Nelson).</p></li>
+      <li><span class="tag warn">Média</span><p><b>Meia-água</b> (Borá 12, Curisco 90, Queen 90): peixe que segue e não sobe, ou hélice ignorada. Fora do repiquete.</p></li>
+      <li><span class="tag neutral">Reserva</span><p><b>Cores fortes</b> (laranja-fogo, chartreuse, vermelho e branco) e cinza: água turvada por chuva ou no encontro com o Rio Branco.</p></li>
+      <li><span class="tag bad">Regra</span><p><b>Outubro é época de ninho:</b> o açu ataca por território. Insista no ponto, provoque e solte rápido. Snap e leader de 0,60 a 0,70 mm.</p></li>
+    </ul>
+
+    <div id="lureCatalog"></div>
+
+    <div class="subtotal">
+      <p><b>Total sugerido:</b> 35 a 40 iscas duras, 15 softs e 4 jigs.</p>
+      <p class="muted small">Marcas: Nelson Nakamura, Marine Sports, Yara, Monster 3X (Baca), Rapala, Lucky Craft. Fotos de lojas que vendem as marcas; a do jig é ilustrativa do tipo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TÁTICAS ===== -->
+<section id="taticas" class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Como pescar</h2>
+      <p class="lead">O dia tem três janelas. Superfície no começo e no fim, fundo no sol a pino. Horário de Manaus.</p>
+    </div>
+
+    <div class="day" aria-hidden="true">
+      <div class="day-axis" id="dayAxis"></div>
+      <div class="day-ticks" id="dayTicks"></div>
+    </div>
+    <div class="windows">
+      <div><b>06:00 às 09:00</b>Primeiro pico de superfície. Zara e popper grandes. Ataque explosivo em praia e beira de barranco.</div>
+      <div><b>11:00 às 14:00</b>Sol a pino. O açu come bem nesse horário em dia quente (IGFA): jig e BacaShad rápidos em poço e sombra de pau.</div>
+      <div><b>15:30 às 18:30</b>Segundo pico de superfície. Volta zara e popper; termina com stick em pausa longa.</div>
+    </div>
+
+    <div class="cols">
+      <div>
+        <h3>Como trabalhar (Nakamura e Monteiro)</h3>
+        <ol class="steps">
+          <li><span>Arremesse colado na estrutura: pau, igarapé, barranco, praia.</span></li>
+          <li><span><b>Chamadinha</b>, a técnica do Nelson Nakamura: toques na isca e <b>parada de 2 a 4 segundos</b> para o peixe vir. Peixe ativo: toques longos; manhoso: toques curtos, deslocando pouco.</span></li>
+          <li><span>Peixe veio atrás ou rebojou: <b>trabalhe mais e desloque menos</b>, catimbando no mesmo lugar. "Uma hora ele explode, porque fica com raiva da isca."</span></li>
+          <li><span>Ponto bom (galhada, bico, boca de lago) merece insistência: o Monteiro dá <b>pelo menos 10 arremessos de hélice</b> na galhada. Ponto sem sinal nenhum: mude.</span></li>
+        </ol>
+      </div>
+      <div>
+        <h3>Cor da isca pela cor da água</h3>
+        <ul class="plain water">
+          <li><span class="w" style="background:oklch(0.30 0.05 55)"></span><span><b>Preta transparente (Rio Negro):</b> branco-bone, natural, metálica.</span></li>
+          <li><span class="w" style="background:oklch(0.62 0.08 70)"></span><span><b>Mista ou pouco suja:</b> laranja-fogo, amarelo, vermelho e branco.</span></li>
+          <li><span class="w" style="background:oklch(0.55 0.09 50)"></span><span><b>Barrenta depois de chuva:</b> vibração vale mais que cor. Chartreuse, vermelho e branco e cinza (Nelson); jig vermelho e branco.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PREVISÃO · ao vivo da Open-Meteo ===== -->
+<section id="clima" class="sec alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Tempo na semana da viagem</h2>
+      <p class="lead">Previsão para a foz do Rio Branco, no meio da região de pesca: o barco sobe o Rio Negro de Manaus até perto da divisa com Roraima. A nota de 0 a 100 é calculada aqui com pressão, chuva, calor, vento e lua: é um palpite para comparar dias, não uma garantia.</p>
+    </div>
+    <div class="fc-meta" id="fcMeta"><span>Carregando…</span></div>
+    <ol class="fc" id="fcList">
+      <li class="skeleton"></li><li class="skeleton"></li><li class="skeleton"></li><li class="skeleton"></li>
+    </ol>
+    <p class="muted small" id="fcStatus" style="margin-top:12px"></p>
+  </div>
+</section>
+
+<!-- ===== VÍDEO ===== -->
+<section id="video" class="sec">
+  <div class="wrap">
+    <div class="sec-head"><h2>Para assistir antes da viagem</h2></div>
+    <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/nXLm_05SEfI" title="Vídeo da pescaria" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    <p style="margin-top:12px"><a href="https://www.youtube.com/watch?v=nXLm_05SEfI" target="_blank" rel="noopener">Abrir o vídeo no YouTube</a></p>
+  </div>
+</section>
+
+<!-- ===== EQUIPAMENTO ===== -->
+<section id="equipamento" class="sec alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Equipamento</h2>
+      <p class="lead">Três conjuntos: dois principais e um reserva. Em 6 dias de barco-hotel, a reserva salva a viagem se algo quebrar.</p>
+    </div>
+    <div class="gear">
+      <div>
+        <h3>Varas</h3>
+        <table class="tbl">
+          <thead><tr><th>Uso</th><th>Ação</th><th>Tamanho</th><th>Potência</th></tr></thead>
+          <tbody>
+            <tr><td>Superfície</td><td>Rápida</td><td>5'6" a 6'0"</td><td>MH · 17-25 lb</td></tr>
+            <tr><td>Meia-água e soft grande</td><td>Extra-rápida</td><td>6'0" a 6'6"</td><td>H · 20-40 lb</td></tr>
+            <tr><td>Reserva</td><td>Rápida</td><td>6'0"</td><td>MH · 17-30 lb</td></tr>
+          </tbody>
+        </table>
+        <p class="muted small" style="margin-top:8px">St. Croix, G. Loomis, Marine Sports Jaguar, Lumis Black Spider, Shimano Cumara.</p>
+      </div>
+      <div>
+        <h3>Carretilhas (2 + 1)</h3>
+        <dl class="facts" style="margin-top:0">
+          <div><dt>Perfil</dt><dd>Baixo</dd></div>
+          <div><dt>Rolamentos</dt><dd>7 ou mais + 1 infinito</dd></div>
+          <div><dt>Recolhimento</dt><dd>6.3:1 a 8.1:1</dd></div>
+          <div><dt>Freio</dt><dd>mínimo 7 kg (ideal 8-10)</dd></div>
+          <div><dt>Capacidade</dt><dd>120 m de multi 0,35 mm</dd></div>
+        </dl>
+        <p class="muted small" style="margin-top:8px">Shimano Curado e Tranx, Daiwa Tatula, Abu Revo Beast.</p>
+      </div>
+      <div>
+        <h3>Linha e leader</h3>
+        <dl class="facts" style="margin-top:0">
+          <div><dt>Linha principal</dt><dd>multi 0,30-0,40 mm (40-65 lb)</dd></div>
+          <div><dt>Leader</dt><dd>fluorocarbono 0,50-0,70 mm · 80-100 cm</dd></div>
+          <div><dt>Nó multi para fluoro</dt><dd>FG (ou Albright reforçado)</dd></div>
+          <div><dt>Reserva</dt><dd>2 carretéis de 500 m</dd></div>
+        </dl>
+        <p class="muted small" style="margin-top:8px">Multi: PowerPro, Sufix 832, Daiwa J-Braid X8. Fluoro: Seaguar, Varivas, Maxima.</p>
+      </div>
+      <div>
+        <h3>Terminais</h3>
+        <ul>
+          <li><b>Snap sólido, nunca argola:</b> #3 e #4 (Saiga, BKK, Owner). Tucunaré abre argola simples.</li>
+          <li><b>Girador:</b> só com hélice; em isca reta tira a ação.</li>
+          <li><b>Anzóis de troca:</b> garateia 2/0 a 4/0 (VMC, Gamakatsu, Owner).</li>
+          <li><b>Jig heads:</b> 3/8, 1/2, 5/8 e 1 oz, dois de cada, para BacaShad.</li>
+          <li><b>Argolas sólidas</b> #5 e #6 para montar softs.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Acessórios</h3>
+        <ul>
+          <li>Alicate de contenção (Boga Grip ou similar).</li>
+          <li>Alicate de ponta curva e tesoura de multifilamento.</li>
+          <li>Luva de kevlar para soltar o peixe.</li>
+          <li>Desenroscador para isca presa em estrutura.</li>
+          <li>Balança portátil (0-25 kg) e régua para fotos.</li>
+          <li>Duas caixas estanques (Plano 3700/3600) e estojo para leader e ferragens.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Sol e conforto</h3>
+        <ul>
+          <li><b>Óculos polarizados</b> (lente âmbar ou cinza): item crítico para ler a margem.</li>
+          <li>Chapéu de aba longa ou buff com proteção UV.</li>
+          <li>Camisa UV de manga longa (FPU 50+).</li>
+          <li>Protetor FPS 50 e protetor labial.</li>
+          <li>Bota de cano médio ou sapatilha antiderrapante.</li>
+          <li>Capa de chuva leve e saco estanque de 10 L.</li>
+          <li>Power bank de 10.000 mAh e cabos.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Saúde e documentos</h3>
+        <ul>
+          <li>Vacina de febre amarela (obrigatória).</li>
+          <li>Licença de pesca amadora (SisPass/ICMBio).</li>
+          <li>Repelente com <b>icaridina 25%</b>.</li>
+          <li>Mosquiteiro pessoal e roupa comprida para a noite.</li>
+          <li>Soro de reidratação, antialérgico e antidiarreico.</li>
+          <li>Documento original, 2 cópias e seguro viagem.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note"><b>Regra dos 3 mestres:</b> carretilha que falhou uma vez é trocada antes da próxima viagem. Leve sempre um kit extra de ferragens.</p>
+  </div>
+</section>
+
+<!-- ===== CHECKLIST ===== -->
+<section id="checklist" class="sec">
+  <div class="wrap">
+    <div class="check-head">
+      <div>
+        <h2>Checklist antes de embarcar</h2>
+        <p class="muted small" style="margin-top:6px">As marcações ficam salvas só neste aparelho.</p>
+      </div>
+      <div class="progress" id="ckProgress">0 de 12</div>
+    </div>
+    <div class="pbar"><i id="ckBar"></i></div>
+    <ul class="checks" id="checks">
+      <li><label><input type="checkbox" data-k="doc"><span>Documento com foto e comprovante de vacina de febre amarela</span></label></li>
+      <li><label><input type="checkbox" data-k="lic"><span>Licença de pesca amadora (SisPass/ICMBio)</span></label></li>
+      <li><label><input type="checkbox" data-k="rep"><span>Repelente com icaridina 25% e mosquiteiro</span></label></li>
+      <li><label><input type="checkbox" data-k="sol"><span>Protetor FPS 50, labial e camisa UV de manga longa</span></label></li>
+      <li><label><input type="checkbox" data-k="vara"><span>Vara MH 5'6" a 6'6" e carretilha de perfil baixo com 7 kg de freio</span></label></li>
+      <li><label><input type="checkbox" data-k="linha"><span>Multi 0,30-0,40 mm e leader fluoro 0,50-0,70 mm</span></label></li>
+      <li><label><input type="checkbox" data-k="snap"><span>Snap sólido, alicates, desenroscador e luva de kevlar</span></label></li>
+      <li><label><input type="checkbox" data-k="oculos"><span>Polarizado, chapéu e bota de cano médio</span></label></li>
+      <li><label><input type="checkbox" data-k="iscas"><span>Kit Nakamura, BacaShad 13 e 17 cm e Borá 12</span></label></li>
+      <li><label><input type="checkbox" data-k="cores"><span>Cores: branco-bone, natural, cromada e reserva de laranja-fogo e chartreuse</span></label></li>
+      <li><label><input type="checkbox" data-k="remedio"><span>Remédios pessoais, soro de reidratação e antialérgico</span></label></li>
+      <li><label><input type="checkbox" data-k="power"><span>Power bank, adaptador 12 V e saco estanque</span></label></li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <h2>A operação</h2>
+    <dl>
+      <div><dt>Operadora</dt><dd>Mundo da Pesca · barco-hotel</dd></div>
+      <div><dt>Barco-hotel</dt><dd>Embarque no Píer da Ponta Negra, em Manaus, logo após o voo · o barco sobe direto pelo Rio Negro até a Foz do Rio Branco · domingo é dia de navegação, a pesca começa segunda de manhã</dd></div>
+      <div><dt>Região de pesca</dt><dd>Rio Negro, subindo de Manaus até perto da divisa com Roraima</dd></div>
+      <div><dt>Roteiro</dt><dd>Rio Negro (Rio Branco descartado pela seca)</dd></div>
+      <div><dt>Incluído</dt><dd>Pensão completa, voadeira, guia e hospedagem a bordo</dd></div>
+    </dl>
+    <p>Fontes: Nelson Nakamura, Eduardo Monteiro, Fabio Baca · SGB · ANA HidroWeb · Open-Meteo · Fish TV. Montado com Claude.</p>
+  </div>
+</footer>
+
+<script>
+/* ================= DADOS (atualizar aqui) ================= */
+
+/* Voo de ida · horários com fuso de cada aeroporto */
+const VOOS = [
+  { titulo:'Ida · domingo, 25/out', resumo:'São Paulo a Manaus, com troca de avião em Brasília', trechos:[
+    { num:'LA4676', de:'GRU', deCidade:'São Paulo · Guarulhos', sai:'2026-10-25T06:55:00-03:00', para:'BSB', paraCidade:'Brasília', chega:'2026-10-25T08:35:00-03:00' },
+    { num:'LA3748', de:'BSB', deCidade:'Brasília', sai:'2026-10-25T10:30:00-03:00', para:'MAO', paraCidade:'Manaus', chega:'2026-10-25T12:25:00-04:00' }
+  ]},
+  { titulo:'Volta · sábado, 31/out', resumo:'Manaus a São Paulo, voo direto', trechos:[
+    { num:'LA3297', de:'MAO', deCidade:'Manaus', sai:'2026-10-31T18:00:00-04:00', para:'GRU', paraCidade:'São Paulo · Guarulhos', chega:'2026-10-31T22:55:00-03:00' }
+  ]}
+];
+
+/* Nível do Rio Negro em Manaus · [data, metros] · out/2026 pela régua do Porto de Manaus */
+const NIVEL_MANAUS = [
+  ['2026-06-30',28.50],['2026-07-07',28.38],['2026-08-01',27.35],['2026-08-11',26.55],['2026-08-18',25.86],
+  ['2026-08-25',25.02],['2026-09-01',24.09],['2026-09-08',22.95],['2026-09-15',21.76],['2026-09-22',20.38],
+  ['2026-09-30',18.88],['2026-10-06',18.15],['2026-10-09',17.92],['2026-10-12',17.70],['2026-10-16',17.43],['2026-10-19',17.21],['2026-10-20',17.12],['2026-10-21',17.04],['2026-10-22',16.97],['2026-10-23',16.90]
+];
+/* Previsão do relatório · [data, mínimo, máximo] */
+const PROJECAO = [ ['2026-10-25',16.7,16.8], ['2026-10-31',16.2,16.6] ];
+const ALERTA_M = 15.0, RECORDE_M = 12.13;
+
+/* Catálogo de iscas · cores: [nome, cor] ou [nome, [cor1, cor2]] */
+const ISCAS = [
+  { grupo:'Superfície', dica:'Manhã e fim de tarde. Zara, stick, popper e hélice.', itens:[
+    { nome:'Zig Zarinha', marca:'Nakamura · zara', qt:3, spec:'9 cm', uso:'Peixe manhoso ou pressionado: isca menor e toques curtos (Nelson)', img:'img/zig.jpg', cred:'Empório da Pesca',
+      cores:[['Branco-bone','#efe6cf'],['Natural','#8a7a52'],['Vermelho e branco',['#c0392b','#ffffff']]] },
+    { nome:'Jumping Stick 95', marca:'Nakamura · stick', qt:2, spec:'9,5 cm · 11,5 g', uso:'Peixe ativo: toque rápido; manhoso: mais pausado, deslocando pouco (Nelson)', img:'img/jumping.jpg', cred:'Empório da Pesca',
+      cores:[['Cabeça-vermelha','#c0392b'],['Dourada','#d4a017'],['Preta e vermelha',['#1b1b1b','#c0392b']]] },
+    { nome:'Sará Sará 100', marca:'Nakamura · zara', qt:2, spec:'10 cm · 12 g', uso:'Açu em tronco: bem lentinha, mais toque que recolhimento (Renan Nakamura)', img:'img/sarasara.jpg', cred:'arquivo do Fausto',
+      cores:[['Natural bass','#6b7a3a'],['Laranja-fogo','#ff6a13'],['Cromada','#c9cfd4']] },
+    { nome:'Happy Popper 95', marca:'Nakamura · popper', qt:3, spec:'9,5 cm · 13 g', uso:'Popadas fortes para chamar e depois uma zaradinha (Monteiro)', img:'img/happy.jpg', cred:'Empório da Pesca',
+      cores:[['Laranja-fogo','#ff6a13'],['Vermelho e branco',['#c0392b','#ffffff']],['Amarelo','#f5d90a']] },
+    { nome:'Rocket', marca:'Nakamura · hélice (Rocket 140)', qt:2, spec:'14 cm · 28 g', uso:'Chamar o açu em galhada; rende com água levemente picada. Ignorada por meia hora: troque por zara', img:'img/rocket.jpg', cred:'Empório da Pesca',
+      cores:[['Cromada','#b9c4cc'],['Vermelho e preto',['#c0392b','#1b1b1b']],['Branco-bone','#efe6cf']] }
+  ]},
+  { grupo:'Meia-água', dica:'Transição das 09h às 11h e das 15h às 16h30.', itens:[
+    { nome:'Queen 90', marca:'Nakamura · meia-água, flutua', qt:2, spec:'9 cm · 12 g', uso:'Toques curtos (catimbinha); o chocalho chama o peixe', img:'img/queen.jpg', cred:'Empório da Pesca',
+      cores:[['Natural','#8a7a52'],['Cabeça-vermelha','#c0392b'],['Chartreuse','#b6e03a']] },
+    { nome:'Curisco 90', marca:'Nakamura · abaixo da superfície, afunda devagar', qt:2, spec:'9 cm · 15 g', uso:'Recolhimento contínuo com toques de ponta de vara', img:'img/curisco.jpg', cred:'Empório da Pesca',
+      cores:[['Laranja-fogo','#ff6a13'],['Natural','#8a7a52'],['Preto e vermelho',['#1b1b1b','#c0392b']]] },
+    { nome:'Borá 12', marca:'Nakamura · meia-água', qt:2, spec:'12 cm · 18 g', uso:'Recolher até o fundo da ação e catimbar sem dó (Nelson)', img:'img/bora12.jpg', cred:'Empório da Pesca',
+      cores:[['Natural bass','#6b7a3a'],['Albino','#f2ede0'],['Vermelho e branco',['#c0392b','#ffffff']]] },
+    { nome:'Crankbait raso (shad)', marca:'várias marcas', qt:2, spec:'9-11 cm · 15-25 g', uso:'Procurar peixe em poço raso', img:'img/crank.jpg', cred:'arquivo do Fausto',
+      cores:[['Natural','#8a7a52'],['Tigre','#b8860b'],['Laranja e preto',['#f28c28','#1b1b1b']]] }
+  ]},
+  { grupo:'Fundo e soft', dica:'Das 11h às 15h, em poços de 4 a 6 m.', itens:[
+    { nome:'BacaShad 13 cm', marca:'Fabio Baca · soft', qt:6, spec:'13 cm · jig head 3/8 a 5/8 oz', uso:'Água turva, sol forte, reserva', img:'img/bacashad.jpg', cred:'Isca e Companhia',
+      cores:[['Branco-perolado','#f4f1ea'],['Chartreuse','#b6e03a'],['Sangue','#8b0000'],['Smoke','#6b6f73']] },
+    { nome:'BacaShad 17 cm', marca:'Fabio Baca · soft', qt:3, spec:'17 cm · jig head 1/2 a 1 oz', uso:'Açu grande em poço e boca de lago; jig head 6/0 sem gravata (Baca)', img:'img/bacashad.jpg', cred:'Isca e Companhia',
+      cores:[['Branco-perolado','#f4f1ea'],['Chartreuse','#b6e03a'],['Preto e roxo',['#1b1b1b','#5b2a86']]] },
+    { nome:'Jig com trailer', marca:'várias marcas', qt:4, spec:'1/2 oz · anzol 6/0 (1 oz só com correnteza)', uso:'Bate no fundo e volta rápido, com acelerações: o açu quase não pega na descida lenta', img:'img/jig.jpg', cred:'Empório da Pesca (Lori Jig, Baca)',
+      cores:[['Vermelho e amarelo',['#c0392b','#f5d90a']],['Vermelho e branco',['#c0392b','#ffffff']],['Preto e branco',['#1b1b1b','#ffffff']]] }
+  ]}
+];
+
+const LOCAIS = {
+  fozbranco: { nome:'Foz do Rio Branco (AM)', lat:-1.40, lon:-61.98 },  /* meio da região de pesca (Manaus até a divisa com RR) */
+  novoairao: { nome:'Novo Airão (AM)', lat:-2.62, lon:-60.94 },
+  barcelos : { nome:'Barcelos (AM)',  lat:-0.97, lon:-62.92 },
+  manaus   : { nome:'Manaus (AM)',    lat:-3.10, lon:-60.02 },
+  boavista : { nome:'Boa Vista (RR)', lat:2.82,  lon:-60.67 },
+  caracarai: { nome:'Caracaraí (RR)', lat:1.80,  lon:-61.12 }
+};
+const VIAGEM_INI = new Date('2026-10-25T00:00:00-04:00');
+const VIAGEM_FIM = new Date('2026-10-31T23:59:59-04:00');
+const PESCA_INI  = new Date('2026-10-26T00:00:00-04:00');  /* domingo 25/out é só navegação */
+
+/* ================= UTIL ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const d = s => new Date(s.length === 10 ? s + 'T12:00:00-04:00' : s);
+const fmtHora = (iso) => iso.slice(11,16);
+const nf1 = n => Number(n).toLocaleString('pt-BR',{minimumFractionDigits:1, maximumFractionDigits:1});
+const nf2 = n => Number(n).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+const ddmm = dt => dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',timeZone:'America/Manaus'});
+/* padrão visual de cada cor (costas em cima, barriga embaixo, cabeça à esquerda) */
+const PADRAO = {
+  'branco-bone':      'linear-gradient(180deg,#d9cba4,#f3ecd8 55%,#fbf8ef)',
+  'natural':          'linear-gradient(180deg,#5b5634 0 30%,#a89a6a 55%,#efe6cc)',
+  'natural bass':     'linear-gradient(180deg,#3f4d1f 0 30%,#8b9a4a 55%,#f0ebcf)',
+  'vermelho e branco':'linear-gradient(90deg,#c0392b 0 32%,#fbfaf6 32%)',
+  'cabeça-vermelha':  'linear-gradient(90deg,#c0392b 0 32%,#f1ede4 32%)',
+  'dourada':          'linear-gradient(180deg,#9c6f08,#f3d36b 45%,#b8860b)',
+  'preta e vermelha': 'linear-gradient(90deg,#c0392b 0 32%,#1b1b1b 32%)',
+  'preto e vermelho': 'linear-gradient(90deg,#1b1b1b 0 32%,#c0392b 32%)',
+  'vermelho e preto': 'linear-gradient(90deg,#c0392b 0 32%,#1b1b1b 32%)',
+  'laranja-fogo':     'linear-gradient(180deg,#2f6b1f 0 22%,#ff6a13 40%,#ffb347 75%,#ffe08a)',
+  'cromada':          'linear-gradient(180deg,#7f8b94,#f4f7f9 42%,#aab4bb 60%,#e9edf0)',
+  'amarelo':          'linear-gradient(180deg,#d9b800,#f5d90a 45%,#fff3a6)',
+  'chartreuse':       'linear-gradient(180deg,#7fa81a,#b6e03a 45%,#e9f7b8)',
+  'albino':           'linear-gradient(180deg,#e7dfcf,#fbf8f1 55%,#f2d7d7)',
+  'tigre':            'repeating-linear-gradient(90deg,#d4a017 0 7px,#2b2b2b 7px 10px)',
+  'laranja e preto':  'linear-gradient(180deg,#1b1b1b 0 38%,#f28c28 38%)',
+  'branco-perolado':  'linear-gradient(180deg,#ddd8ce,#ffffff 45%,#e9e4da)',
+  'sangue':           'linear-gradient(180deg,#5c0000,#8b0000 50%,#b33a3a)',
+  'smoke':            'linear-gradient(180deg,#4f5357,#8d9296 50%,#c3c7ca)',
+  'preto e roxo':     'linear-gradient(180deg,#1b1b1b 0 50%,#5b2a86 50%)',
+  'vermelho e amarelo':'linear-gradient(90deg,#c0392b 0 40%,#f5d90a 40%)',
+  'preto e branco':   'linear-gradient(90deg,#1b1b1b 0 40%,#f4f4f4 40%)',
+  'laranja/preto':    'linear-gradient(180deg,#1b1b1b 0 38%,#f28c28 38%)',
+  'branco':           'linear-gradient(180deg,#e6e6e6,#ffffff 50%)'
+};
+function swatch(c, nome){
+  const p = nome && PADRAO[nome.toLowerCase()];
+  if (p) return p;
+  return Array.isArray(c) ? `linear-gradient(90deg, ${c[0]} 32%, ${c[1]} 32%)` : c;
+}
+
+/* ================= CONTAGEM ================= */
+function contagem(){
+  const alvo = d(VOOS[0].trechos[0].sai), now = new Date(), ms = alvo - now;
+  const n = $('#cdN'), u = $('#cdU'), sub = $('#cdSub'), clk = $('#cdClock');
+  if (now > VIAGEM_FIM){ n.textContent = 'Fim'; u.textContent = ''; clk.hidden = true; sub.textContent = 'Viagem encerrada. Que venham as fotos.'; return; }
+  if (ms <= 0){ n.textContent = 'Já'; u.textContent = 'em viagem'; clk.hidden = true; sub.textContent = 'De 25 a 31/out no Rio Negro.'; return; }
+  const dias = Math.floor(ms/86400000), h = Math.floor(ms%86400000/3600000), m = Math.floor(ms%3600000/60000), sg = Math.floor(ms%60000/1000);
+  const p2 = x => String(x).padStart(2,'0');
+  if (dias > 0){
+    n.textContent = dias; u.textContent = dias === 1 ? 'dia' : 'dias';
+    clk.innerHTML = `<span><b>${p2(h)}</b>h</span><span><b>${p2(m)}</b>min</span><span><b>${p2(sg)}</b>s</span>`;
+  } else {
+    n.textContent = h; u.textContent = h === 1 ? 'hora' : 'horas';
+    clk.innerHTML = `<span><b>${p2(m)}</b>min</span><span><b>${p2(sg)}</b>s</span>`;
+  }
+  clk.hidden = false;
+}
+
+/* ================= IDADE DOS DADOS ================= */
+function idadeDados(){
+  const v = document.getElementById('relatorio-mensal')?.dataset.versao; if (!v) return;
+  const hoje = new Date().toLocaleDateString('sv-SE',{timeZone:'America/Manaus'});
+  const dias = Math.round((Date.parse(hoje) - Date.parse(v)) / 86400000);
+  const dm = v.slice(8,10) + '/' + ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][+v.slice(5,7)-1];
+  const quando = dias <= 0 ? 'hoje' : dias === 1 ? 'há 1 dia' : `há ${dias} dias`;
+  const velho = dias > 3;
+  document.querySelectorAll('[data-fresh]').forEach(el => {
+    if (!el.dataset.base) el.dataset.base = el.textContent;
+    if (el.dataset.fresh === 'hero') el.innerHTML = `Dados de <b>${dm}</b> · ${quando}`;
+    else el.textContent = el.dataset.base + (velho ? ` · ${quando}` : '');
+    el.classList.toggle('stale', velho);
+  });
+}
+
+/* ================= LINHA DO TEMPO ================= */
+function linhaDoTempo(){
+  const ini = new Date('2026-10-01T00:00:00-04:00'), fim = new Date('2026-11-01T00:00:00-04:00'), now = new Date();
+  const pct = Math.max(0, Math.min(100, (now - ini) / (fim - ini) * 100));
+  $('#tlFill').style.width = pct + '%';
+  const t = $('#tlToday'); t.style.left = pct + '%';
+  if (now < ini || now > fim) t.hidden = true;
+  let marcouProx = false;
+  document.querySelectorAll('#tlList li').forEach(li => {
+    const dia = new Date(li.dataset.d + 'T23:59:59-04:00');
+    if (dia < now) li.classList.add('past');
+    else if (!marcouProx){ li.classList.add('next'); marcouProx = true; }
+  });
+}
+
+/* ================= GRÁFICO DO RIO ================= */
+function graficoRio(){
+  const svg = $('#riverChart'); if (!svg) return;
+  const W = svg.clientWidth || 800, H = svg.clientHeight || 300;
+  const estreito = W < 600;
+  const pad = { l:34, r: estreito ? 12 : 168, t:16, b:28 };
+  const serie = estreito ? NIVEL_MANAUS.filter(p => p[0] >= '2026-08-01') : NIVEL_MANAUS;
+  const x0 = d(serie[0][0]).getTime(), x1 = d('2026-11-02').getTime();
+  const y0 = 11, y1 = 30;
+  const X = t => pad.l + (t - x0) / (x1 - x0) * (W - pad.l - pad.r);
+  const Y = m => pad.t + (y1 - m) / (y1 - y0) * (H - pad.t - pad.b);
+  const C = { grid:'oklch(1 0 0 / .09)', txt:'oklch(0.85 0.022 210)', gold:'oklch(0.86 0.15 88)', line:'oklch(0.975 0.006 200)', alert:'oklch(0.72 0.14 32)', rec:'oklch(0.85 0.022 210)' };
+  let s = '';
+  // grade horizontal
+  [12,16,20,24,28].forEach(m => {
+    s += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${Y(m)}" y2="${Y(m)}" stroke="${C.grid}"/>`;
+    s += `<text x="${pad.l-8}" y="${Y(m)+4}" fill="${C.txt}" font-size="11" text-anchor="end">${m}</text>`;
+  });
+  // meses
+  const meses = [['2026-07-01','jul'],['2026-08-01','ago'],['2026-09-01','set'],['2026-10-01','out'],['2026-11-01','nov']];
+  meses.forEach(([iso,lab]) => { const t = d(iso).getTime(); if (t < x0 || X(t) > W - 24) return;
+    s += `<line x1="${X(t)}" x2="${X(t)}" y1="${pad.t}" y2="${H-pad.b}" stroke="${C.grid}"/>`;
+    s += `<text x="${X(t)+4}" y="${H-8}" fill="${C.txt}" font-size="11">${lab}</text>`; });
+  // janela da viagem
+  const v0 = X(VIAGEM_INI.getTime()), v1 = X(VIAGEM_FIM.getTime());
+  s += `<rect x="${v0}" y="${pad.t}" width="${v1-v0}" height="${H-pad.t-pad.b}" fill="oklch(1 0 0 / .07)"/>`;
+  s += `<text x="${(v0+v1)/2}" y="${pad.t+12}" fill="${C.txt}" font-size="11" text-anchor="middle" font-weight="700">viagem</text>`;
+  // linhas de referência
+  const ref = (m, cor, txt, dash) => {
+    s += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${Y(m)}" y2="${Y(m)}" stroke="${cor}" stroke-width="1.5" ${dash?'stroke-dasharray="5 5"':''}/>`;
+    s += estreito ? `<text x="${pad.l+6}" y="${Y(m)-6}" fill="${cor}" font-size="11" font-weight="700">${txt}</text>`
+                  : `<text x="${W-pad.r+8}" y="${Y(m)+4}" fill="${cor}" font-size="11.5" font-weight="700">${txt}</text>`;
+  };
+  ref(ALERTA_M, C.alert, 'alerta 15 m', false);
+  ref(RECORDE_M, C.rec, 'recorde 12,13 m (2024)', true);
+  // faixa da previsão
+  const last = serie[serie.length-1], tl = d(last[0]).getTime();
+  const top = [[tl,last[1]], ...PROJECAO.map(p => [d(p[0]).getTime(), p[2]])];
+  const bot = [...PROJECAO.map(p => [d(p[0]).getTime(), p[1]])].reverse().concat([[tl,last[1]]]);
+  s += `<polygon points="${top.concat(bot).map(p => X(p[0]) + ',' + Y(p[1])).join(' ')}" fill="oklch(0.86 0.15 88 / .6)"/>`;
+  const p25 = PROJECAO[0];
+  s += `<text x="${X(d(p25[0]).getTime())-6}" y="${estreito ? Y(20) : Y(p25[2])-8}" fill="${C.gold}" font-size="12" font-weight="800" text-anchor="end">${nf1(p25[1])} a ${nf1(p25[2])} m</text>`;
+  // linha medida
+  const pts = serie.map(p => [X(d(p[0]).getTime()), Y(p[1])]);
+  const path = 'M' + pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' L');
+  s += `<path class="obs" d="${path}" fill="none" stroke="${C.line}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+  pts.forEach((p,i) => { if (i === pts.length-1) return; s += `<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="${C.line}"/>`; });
+  const lp = pts[pts.length-1];
+  s += `<circle cx="${lp[0]}" cy="${lp[1]}" r="6" fill="${C.line}" stroke="oklch(0.28 0.052 222)" stroke-width="2"/>`;
+  s += `<text x="${lp[0]-12}" y="${lp[1]+22}" fill="oklch(0.975 0.006 200)" font-size="13" font-weight="800" text-anchor="end">${nf2(last[1])} m · ${ddmm(d(last[0]))}</text>`;
+  const first = serie[0];
+  s += `<text x="${pts[0][0]+6}" y="${pts[0][1]-10}" fill="${C.txt}" font-size="11.5">${nf1(first[1])} m em ${ddmm(d(first[0]))}</text>`;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = s;
+  const obs = svg.querySelector('.obs'); if (obs) obs.style.setProperty('--len', Math.ceil(obs.getTotalLength()));
+}
+
+/* ================= VOO ================= */
+const hm = min => `${Math.floor(min/60)}h${String(min%60).padStart(2,'0')}`;
+function voo(){
+  let k = 0;
+  $('#trips').innerHTML = VOOS.map(v => {
+    const h = [];
+    v.trechos.forEach((t,i) => {
+      const dur = Math.round((d(t.chega) - d(t.sai)) / 60000);
+      h.push(`<li class="leg" data-i="${k++}">
+        <div><div class="t">${fmtHora(t.sai)}</div><div class="ap">${t.de}</div><div class="city">${esc(t.deCidade)}</div></div>
+        <div class="mid"><b>${t.num}</b><div class="line"></div>${hm(dur)}</div>
+        <div class="end"><div class="t">${fmtHora(t.chega)}</div><div class="ap">${t.para}</div><div class="city">${esc(t.paraCidade)}</div></div>
+      </li>`);
+      const prox = v.trechos[i+1];
+      if (prox) h.push(`<li class="leg wait">Troca de avião em ${esc(t.paraCidade)}: <b>${hm(Math.round((d(prox.sai) - d(t.chega)) / 60000))} de espera</b></li>`);
+    });
+    return `<div class="trip"><h3 class="trip-h">${esc(v.titulo)}<span>${esc(v.resumo)}</span></h3><ol class="legs">${h.join('')}</ol></div>`;
+  }).join('');
+  const nums = VOOS.flatMap(v => v.trechos.map(t => t.num));
+  $('#fLinks').innerHTML = nums.map(n => `<a class="btn" href="https://www.flightradar24.com/data/flights/${n.toLowerCase()}" target="_blank" rel="noopener">${n} ao vivo</a>`).join('')
+    + `<a class="btn solid" href="https://www.latamairlines.com/br/pt/minhas-viagens" target="_blank" rel="noopener">Abrir no site da LATAM</a>`;
+  statusVoo();
+}
+function statusVoo(){
+  const now = new Date(), tag = $('#fStatusTag'), st = $('#fStatus');
+  const set = (cls, t, txt, ativo) => {
+    tag.className = 'tag ' + cls; tag.textContent = t; st.textContent = txt;
+    document.querySelectorAll('.leg[data-i]').forEach(li => li.classList.toggle('active', String(ativo) === li.dataset.i));
+  };
+  const legs = VOOS.flatMap((v,vi) => v.trechos.map((t,ti) => ({ ...t, vi, primeiro: ti === 0 })));
+  for (let i = 0; i < legs.length; i++){
+    const t = legs[i], sai = d(t.sai), chega = d(t.chega);
+    if (now < sai){
+      if (t.primeiro){
+        const horas = (sai - now) / 3600000, aero = t.deCidade.split(' · ').pop();
+        const [hh, mm] = fmtHora(t.sai).split(':').map(Number), m2 = (hh*60 + mm - 120 + 1440) % 1440;
+        const limite = `${String(Math.floor(m2/60)).padStart(2,'0')}:${String(m2%60).padStart(2,'0')}`;
+        const qual = t.vi === 0 ? 'Ida' : 'Volta';
+        if (t.vi > 0 && now > d(legs[i-1].chega) && horas > 24){
+          const domingo = now < new Date('2026-10-26T05:00:00-04:00');
+          set('ok', domingo ? 'Navegando' : 'Pescando', domingo ? 'Embarque no Píer da Ponta Negra e dia de viagem no barco, subindo o Rio Negro até a Foz do Rio Branco. A pesca começa segunda de manhã.' : `Voo de volta no sábado 31/out, às ${fmtHora(t.sai)} em ${aero}.`, -1);
+        }
+        else if (horas > 48) set('neutral','Programado', `${qual}: faltam ${Math.floor(horas/24)} dias. Embarque em ${aero} às ${fmtHora(t.sai)}.`, i);
+        else if (horas > 3) set('warn','Check-in aberto', `${qual} em ${Math.floor(horas)} horas. Chegue ao aeroporto de ${aero} até as ${limite}.`, i);
+        else set('warn','Embarque próximo', `Embarque em ${aero} às ${fmtHora(t.sai)}. Confira o portão no app.`, i);
+      } else set('ok','Conexão', `Em ${legs[i-1].paraCidade}. ${t.num} sai às ${fmtHora(t.sai)}.`, i);
+      return;
+    }
+    if (now < chega){ set('ok','Em voo', `${t.num} a caminho de ${t.paraCidade.split(' · ')[0]}. Pouso previsto às ${fmtHora(t.chega)}${t.para === 'MAO' ? ' (hora de Manaus)' : ''}.`, i); return; }
+  }
+  set('neutral','Viagem encerrada', 'Pelo horário marcado, a turma já voltou a São Paulo.', -1);
+}
+
+/* ================= ISCAS ================= */
+function iscas(){
+  $('#lureCatalog').innerHTML = ISCAS.map(g => {
+    const total = g.itens.reduce((a,i) => a + i.qt, 0);
+    return `<div class="lure-group"><h3>${esc(g.grupo)}<span>${total} unidades</span></h3><p>${esc(g.dica)}</p><ul class="lures">` +
+      g.itens.map(i => {
+        const pic = i.img
+          ? `<div class="lure-pic"><img src="${i.img}" alt="Isca ${esc(i.nome)}" loading="lazy" width="112" height="112"></div>`
+          : `<div class="lure-pic sw" aria-hidden="true">${i.cores.map(c => `<span style="background:${swatch(c[1])}"></span>`).join('')}<em>sem foto</em></div>`;
+        return `<li class="lure">${pic}<div>
+          <div class="lure-top"><div><div class="lure-name">${esc(i.nome)}</div><div class="lure-maker">${esc(i.marca)}</div></div>
+          <div class="qty"><b>${i.qt}</b><span>un.</span></div></div>
+          <div class="lure-spec">${esc(i.spec)}</div>
+          <div class="lure-use">${esc(i.uso)}</div>
+        </div>
+        <div class="swatches" aria-label="Cores">${i.cores.map(c => `<span><i style="background:${swatch(c[1], c[0])}" aria-hidden="true"></i>${esc(c[0])}</span>`).join('')}</div>
+        ${i.cred ? `<div class="credit">Foto: ${esc(i.cred)}</div>` : ''}
+        </li>`;
+      }).join('') + `</ul></div>`;
+  }).join('');
+}
+
+/* ================= DIA (janelas) ================= */
+function dia(){
+  const a = 5, b = 19, P = h => (h - a) / (b - a) * 100;
+  const wins = [[6,9,'06:00-09:00','Superfície',''],[11,14,'11:00-14:00','Fundo e soft','mid'],[15.5,18.5,'15:30-18:30','Superfície','']];
+  $('#dayAxis').innerHTML = wins.map(w => `<div class="win ${w[4]}" style="left:${P(w[0])}%;width:${P(w[1])-P(w[0])}%"><b>${w[3]}</b>${w[2]}</div>`).join('');
+  $('#dayTicks').innerHTML = [6,9,12,15,18].map(h => `<span style="left:${P(h)}%">${h}h</span>`).join('');
+}
+
+/* ================= LUA ================= */
+function moonPhase(date){
+  const y = date.getUTCFullYear(), m = date.getUTCMonth()+1, dd = date.getUTCDate();
+  let yy = y, mm = m; if (mm < 3){ yy--; mm += 12; }
+  let jd = 365.25*yy + 30.6*(mm+1) + dd - 694039.09; jd /= 29.5305882;
+  const phase = jd - Math.floor(jd), age = phase*29.53;
+  const nomes = [[1.84,'Nova'],[5.53,'Crescente'],[9.22,'Quarto crescente'],[12.91,'Crescente gibosa'],[16.61,'Cheia'],[20.30,'Minguante gibosa'],[23.99,'Quarto minguante'],[27.68,'Minguante'],[30,'Nova']];
+  const nome = nomes.find(n => age <= n[0])[1];
+  return { age, phase, nome };
+}
+function moonSvg(phase){
+  const r = 8, c = 10, k = Math.cos(2*Math.PI*phase), rx = Math.abs(k)*r, waxing = phase < .5;
+  const outer = waxing ? 1 : 0, inner = waxing ? (k > 0 ? 0 : 1) : (k > 0 ? 1 : 0);
+  return `<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${r}" fill="oklch(0.34 0.04 222)"/>` +
+    `<path d="M${c},${c-r} A${r},${r} 0 0 ${outer} ${c},${c+r} A${rx},${r} 0 0 ${inner} ${c},${c-r}Z" fill="oklch(0.93 0.06 90)"/>` +
+    `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="oklch(0.24 0.03 222 / .5)"/></svg>`;
+}
+function moonScore(age){
+  const d1 = Math.min(Math.abs(age), Math.abs(age-29.53)), d2 = Math.abs(age-14.77), x = Math.min(d1,d2);
+  return x <= 1.5 ? 90 : x <= 3 ? 75 : x <= 5 ? 60 : 45;
+}
+
+/* ================= PREVISÃO ================= */
+function scoreDay({tmax, rain, pressure, dPressure, wind, moonAge}){
+  let s = 50;
+  if (pressure >= 1010 && pressure <= 1016) s += 15; else if (pressure >= 1008 && pressure <= 1018) s += 8; else s -= 5;
+  if (dPressure != null){ const a = Math.abs(dPressure); if (a < 1) s += 10; else if (a < 2) s += 4; else if (a < 3) s -= 5; else s -= 15; }
+  if (rain != null){ if (rain < 1) s += 8; else if (rain < 5) s += 2; else if (rain < 15) s -= 6; else s -= 15; }
+  if (tmax >= 28 && tmax <= 33) s += 6; else if (tmax > 33) s -= 4;
+  if (wind != null){ if (wind < 10) s += 3; else if (wind < 20) s += 1; else if (wind < 30) s -= 4; else s -= 10; }
+  s = Math.round(s*0.7 + moonScore(moonAge)*0.3);
+  return Math.max(0, Math.min(100, s));
+}
+function dica(sc){
+  if (sc >= 75) return 'Excelente: zara e popper desde o amanhecer, insistir em margem e boca de igarapé.';
+  if (sc >= 55) return 'Bom: superfície de manhã e à tarde, BacaShad no sol a pino.';
+  if (sc >= 40) return 'Moderado: BacaShad e Borá, procurar sombra e poço.';
+  return 'Difícil: isca de fundo, arremesso curto e paciência.';
+}
+function nivel(sc){ return sc >= 75 ? ['Excelente','var(--ok)'] : sc >= 55 ? ['Bom','var(--ok)'] : sc >= 40 ? ['Moderado','var(--warn)'] : ['Difícil','var(--bad)']; }
+
+let pedido = 0;
+async function previsao(key){
+  const loc = LOCAIS[key], meu = ++pedido;
+  $('#fcStatus').textContent = '';
+  $('#fcMeta').innerHTML = `<span>Consultando ${esc(loc.nome)}…</span>`;
+  $('#fcList').innerHTML = '<li class="skeleton"></li>'.repeat(5);
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}`
+    + `&daily=temperature_2m_max,precipitation_sum,windspeed_10m_max,pressure_msl_mean&timezone=America%2FManaus&forecast_days=16`;
+  try {
+    const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json(); if (meu !== pedido) return;
+    const D = j.daily; if (!D) throw new Error('sem dados');
+    const rows = D.time.map((t,i) => {
+      if (D.temperature_2m_max[i] == null && D.precipitation_sum[i] == null) return null;
+      const date = new Date(t + 'T12:00:00-04:00'), mp = moonPhase(date);
+      const p = D.pressure_msl_mean[i], dp = (i > 0 && p != null && D.pressure_msl_mean[i-1] != null) ? p - D.pressure_msl_mean[i-1] : null;
+      const sc = scoreDay({ tmax:D.temperature_2m_max[i], rain:D.precipitation_sum[i], pressure:p, dPressure:dp, wind:D.windspeed_10m_max[i], moonAge:mp.age });
+      return { date, mp, p, dp, tmax:D.temperature_2m_max[i], rain:D.precipitation_sum[i], wind:D.windspeed_10m_max[i], sc };
+    }).filter(Boolean);
+    const avg = Math.round(rows.reduce((a,b) => a + b.sc, 0) / rows.length);
+    const best = rows.reduce((a,b) => b.sc > a.sc ? b : a);
+    const viag = rows.filter(r => r.date >= VIAGEM_INI && r.date <= VIAGEM_FIM);
+    const pescaV = viag.filter(r => r.date >= PESCA_INI);
+    const bestV = pescaV.length ? pescaV.reduce((a,b) => b.sc > a.sc ? b : a) : null;
+    $('#fcMeta').innerHTML = (bestV
+      ? `<span>Dias da viagem já na previsão: <b>${viag.length} de 7</b></span><span>Melhor dia de pesca: <b>${bestV.date.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</b></span>`
+      : `<span>Nota média dos próximos dias: <b>${avg}</b></span>`);
+    const linha = (r, comDica) => {
+      const [lbl, cor] = nivel(r.sc), naViagem = r.date >= VIAGEM_INI && r.date <= VIAGEM_FIM;
+      const f = (n, dgt) => n == null ? '–' : Number(n).toLocaleString('pt-BR',{maximumFractionDigits:dgt});
+      return `<li class="fc-row${naViagem ? ' trip' : ''}">
+        <div class="fc-date">${r.date.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}<small>${r.date.toLocaleDateString('pt-BR',{weekday:'long'})}${naViagem ? ' · viagem' : ''}</small></div>
+        <div title="Lua ${r.mp.nome}">${moonSvg(r.mp.phase)}</div>
+        <div class="fc-bar"><b>${r.sc}</b><span class="bar"><i style="width:${r.sc}%;background:${cor}"></i></span><span class="lbl" style="color:${cor}">${lbl}</span></div>
+        <div class="fc-wx">${f(r.tmax,0)} °C · chuva ${f(r.rain,1)} mm · vento ${f(r.wind,0)} km/h · ${f(r.p,0)} hPa</div>
+        ${comDica ? `<div class="fc-tip">${r.date < PESCA_INI ? 'Dia de navegação no barco, sem pesca.' : dica(r.sc)}</div>` : ''}
+      </li>`;
+    };
+    const naViagem = rows.filter(r => r.date >= VIAGEM_INI && r.date <= VIAGEM_FIM), outros = rows.filter(r => !naViagem.includes(r));
+    const aviso = naViagem.length ? '' : `<li class="fc-empty">A semana da viagem (25 a 31/out) ainda está fora do alcance da previsão.</li>`;
+    $('#fcList').innerHTML = aviso + naViagem.map(r => linha(r, true)).join('') +
+      (outros.length ? `<li class="fc-more"><details class="more-in"><summary>Ver os outros ${outros.length} dias</summary><ol class="fc">${outros.map(r => linha(r, false)).join('')}</ol></details></li>` : '');
+    $('#fcStatus').textContent = `Consultado em ${new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}. Fonte: Open-Meteo. Lua: ícone de cada dia.`;
+  } catch (e) {
+    if (meu !== pedido) return;
+    $('#fcMeta').innerHTML = '';
+    $('#fcList').innerHTML = '';
+    $('#fcStatus').innerHTML = `Não deu para buscar a previsão agora (sem internet ou serviço fora). <button class="btn" type="button" id="fcRetry" style="margin-left:8px">Tentar de novo</button>`;
+    $('#fcRetry').onclick = () => previsao(key);
+  }
+}
+
+/* ================= CHECKLIST ================= */
+function checklist(){
+  const KEY = 'pesca2026-checklist';
+  let st = {}; try { st = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){}
+  const boxes = [...document.querySelectorAll('#checks input')];
+  const upd = () => {
+    const n = boxes.filter(b => b.checked).length;
+    $('#ckProgress').textContent = n === boxes.length ? 'Tudo pronto' : `${n} de ${boxes.length}`;
+    $('#ckBar').style.transform = `scaleX(${n / boxes.length})`;
+  };
+  boxes.forEach(b => {
+    b.checked = !!st[b.dataset.k];
+    b.addEventListener('change', () => { st[b.dataset.k] = b.checked; try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} upd(); });
+  });
+  upd();
+}
+
+/* ================= NAV ATIVA ================= */
+function navAtiva(){
+  const links = [...document.querySelectorAll('.nav a')];
+  const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if (!e.isIntersecting) return;
+      links.forEach(a => a.removeAttribute('aria-current'));
+      const a = map.get(e.target.id); if (a){ a.setAttribute('aria-current','true'); a.parentElement.parentElement.scrollTo({left:a.parentElement.offsetLeft - 16, behavior:'smooth'}); }
+    });
+  }, { rootMargin:'-45% 0px -50% 0px' });
+  map.forEach((a,id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+}
+
+/* ================= PLANO DE PESCA POR DIA ================= */
+/* Regra isca x condição. Resumo em oppen/skill-plano-pesca/SKILL.md (manter os dois iguais). */
+const PERIODOS = [
+  { k:'manha', nome:'Manhã',        faixa:'06:00 às 10:00', h:[6,7,8,9],        base:'sup'   },
+  { k:'meio',  nome:'Meio do dia',  faixa:'10:00 às 15:00', h:[10,11,12,13,14], base:'fundo' },
+  { k:'tarde', nome:'Fim de tarde', faixa:'15:00 às 18:30', h:[15,16,17,18],    base:'sup'   }
+];
+const CORES_AGUA = {
+  preta:    { nome:'preta transparente', cores:['Branco-bone','Natural','Cromada'] },
+  mista:    { nome:'mista ou pouco suja', cores:['Laranja-fogo','Amarelo','Vermelho e branco'] },
+  barrenta: { nome:'barrenta',            cores:['Chartreuse','Vermelho e branco','Smoke'] }
+};
+const COMO = {
+  sup:   'Arremesso colado na margem, pau ou boca de lago. Chamadinha (Nelson Nakamura): toques e parada de 2 a 4 segundos. Peixe manhoso: toques curtos, deslocando pouco.',
+  sub:   'Recolhimento contínuo com toques de ponta de vara e pausas curtas, logo abaixo da superfície.',
+  fundo: 'Jig de 1/2 oz em poço e boca de lago: deixar bater no fundo e voltar rápido, com acelerações. O açu quase não pega na descida lenta.'
+};
+const TIPO = { sup:'Superfície', sub:'Abaixo da superfície', fundo:'Fundo e soft' };
+
+function recomendar(c, per, ctx){
+  const porque = [];
+  let agua = ctx.agua || 'preta';
+  if (!ctx.agua && c && (c.rain >= 3 || c.rain24 >= 15)){ agua = 'mista'; porque.push('chuva pode sujar a água: cores mais fortes'); }
+  let modo = per.base;
+  if (per.k === 'meio' && c && c.cloud >= 70 && c.rain < 1){ modo = 'sub'; porque.push('nublado segura o peixe mais em cima no meio do dia'); }
+  const queda = c && (c.dp24 <= -2.5 || c.dp3 <= -1.5);
+  if (queda){ modo = modo === 'sup' ? 'sub' : 'fundo'; porque.push('pressão caindo: peixe mais preguiçoso, isca mais funda e pausa longa'); }
+  else if (c && c.dp24 >= 2) porque.push('pressão subindo: peixe mais ativo');
+  else if (c) porque.push('pressão estável');
+  if (c && c.wind > 20 && modo === 'sup'){ modo = 'sub'; porque.push('vento forte atrapalha zara e popper'); }
+  if (c && c.rain >= 8 && modo === 'sup'){ modo = 'sub'; porque.push('chuva forte no período'); }
+  // Rio subindo na seca = repiquete: agua nova e fria, peixe manhoso e mais fundo (Nakamura, Monteiro).
+  const repiquete = ctx.nivel === 'subindo';
+  if (repiquete){ modo = 'sub'; porque.push('repiquete: peixe manhoso e mais fundo; isca lenta e sem chocalho, de preferência perto da boca do rio (Monteiro e Nakamura)'); }
+  if (ctx.nivel === 'descendo' && modo === 'fundo') porque.push('rio descendo: peixe junta em poço e boca de igarapé');
+  let iscas;
+  if (modo === 'sup'){
+    if (c && c.wind >= 8){ iscas = ['Rocket','Sará Sará 100']; porque.push('vento leve: hélice chama pelo barulho'); }
+    else iscas = per.k === 'manha' ? ['Sará Sará 100','Jumping Stick 95'] : ['Sará Sará 100','Happy Popper 95'];  /* açu: isca maior primeiro */
+  } else if (repiquete){
+    iscas = ['Curisco 90','BacaShad 13 cm'];  // Curisco afunda devagar; soft natural e lento (Monteiro). Sem Borá e Queen: chocalho não produz no repiquete (Nakamura)
+  } else if (modo === 'sub'){
+    iscas = per.k === 'meio' ? ['Curisco 90','Queen 90'] : ['Curisco 90','Borá 12'];
+  } else {
+    iscas = ['Jig com trailer','BacaShad 17 cm'];
+    if (c && c.cloud < 70) porque.push('sol forte: açu come bem no meio do dia em poço e sombra (IGFA)');
+  }
+  if (agua === 'barrenta' && modo !== 'fundo' && !repiquete) { iscas[1] = 'Rocket'; porque.push('água barrenta: vibração vale mais que cor'); }
+  // jig tem cor própria (Acute Angling): vermelho e amarelo; vermelho e branco em água turva
+  const cores = iscas[0] === 'Jig com trailer' ? (agua === 'preta' ? ['Vermelho e amarelo','Vermelho e branco','Preto e branco'] : ['Vermelho e branco','Vermelho e amarelo','Chartreuse']) : CORES_AGUA[agua].cores;
+  return { modo, iscas, cores, agua, porque };
+}
+
+function lerPlano(){
+  try { return JSON.parse(document.getElementById('plano-dados').textContent); }
+  catch(e){ return { dias:{}, local_padrao: LOCAIS.fozbranco }; }
+}
+const ISCA_POR_NOME = n => ISCAS.flatMap(g => g.itens).find(i => i.nome === n);
+const corHex = n => { const i = ISCAS.flatMap(g => g.itens).flatMap(x => x.cores).find(c => c[0].toLowerCase() === n.toLowerCase()); return swatch(i ? i[1] : '#ccc', n); };
+
+/* ================= TRAJETO DA VIAGEM (mapa) ================= */
+const LEAFLET = {
+  css:['https://unpkg.com/leaflet@1.9.4/dist/leaflet.css','sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='],
+  js:['https://unpkg.com/leaflet@1.9.4/dist/leaflet.js','sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=']
+};
+function carregarLeaflet(){
+  return new Promise((ok, falha) => {
+    if (window.L) return ok();
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = LEAFLET.css[0]; l.integrity = LEAFLET.css[1]; l.crossOrigin = '';
+    const s = document.createElement('script'); s.src = LEAFLET.js[0]; s.integrity = LEAFLET.js[1]; s.crossOrigin = '';
+    s.onload = ok; s.onerror = falha;
+    document.head.append(l, s);
+  });
+}
+const SEMANA = ['dom','seg','ter','qua','qui','sex','sáb'];
+/* mostra a hora como foi gravada (hora local do lugar), sem converter fuso */
+function quandoTxt(iso){
+  const [d, h] = String(iso).split('T');
+  const [a, m, dia] = d.split('-').map(Number);
+  const sem = SEMANA[new Date(Date.UTC(a, m - 1, dia)).getUTCDay()];
+  return `${sem} ${String(dia).padStart(2,'0')}/${String(m).padStart(2,'0')}` + (h ? ` · ${h.slice(0,5)}` : '');
+}
+const fotoOk = f => typeof f === 'string' && /^img\/[\w.-]+\.(jpe?g|webp|png)$/i.test(f);
+function capTxt(c){
+  if (!c) return '';
+  const num = v => String(v).replace('.', ',');
+  const isca = [c.isca, c.cor].filter(Boolean).join(' ');
+  return [c.especie, c.tamanho_cm && num(c.tamanho_cm) + ' cm', c.peso_kg && num(c.peso_kg) + ' kg',
+          isca && 'isca ' + isca, c.pescador && 'por ' + c.pescador].filter(Boolean).join(' · ');
+}
+/* todas as fotos de um ponto: lista "fotos" (nova) ou o par foto/mini (antigo) */
+function fotosDe(p){
+  const l = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [{ foto:p.foto, mini:p.mini }] : []);
+  return l.filter(f => f && fotoOk(f.foto)).map(f => ({ foto:f.foto, mini: fotoOk(f.mini) ? f.mini : f.foto }));
+}
+function trajeto(){
+  let d;
+  try { d = JSON.parse(document.getElementById('trajeto-dados').textContent); } catch(e){ d = { pontos:[] }; }
+  const pts = (d.pontos || []).filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon))
+    .sort((a, b) => new Date(a.quando) - new Date(b.quando));
+  const caixa = $('#mapaTrajeto');
+  const ncap = pts.filter(p => p.captura).length;
+  $('#trajetoStamp').textContent = pts.length ? `${pts.length} ${pts.length === 1 ? 'ponto' : 'pontos'}` + (ncap ? ` · ${ncap} ${ncap === 1 ? 'captura' : 'capturas'}` : '') + ` · último em ${quandoTxt(pts[pts.length-1].quando)}` : '';
+  if (!pts.length){
+    $('#paradas').outerHTML = '<p class="trajeto-vazio">O trajeto começa no domingo, 25/out. Cada localização mandada durante a viagem aparece aqui, em ordem, com dia e hora.</p>';
+  } else {
+    $('#paradas').innerHTML = pts.map((p, i) => {
+      const cls = [i === pts.length-1 ? 'ult' : '', p.captura ? 'cap' : ''].filter(Boolean).join(' ');
+      const alt = esc(p.captura ? capTxt(p.captura) : (p.nome || 'Foto da viagem'));
+      const lista = fotosDe(p);
+      const foto = lista.length > 1
+        ? `<div class="fotos">${lista.map(f => `<a href="${esc(f.foto)}" target="_blank" rel="noopener"><img src="${esc(f.mini)}" alt="${alt}" loading="lazy"></a>`).join('')}</div>`
+        : lista.length ? `<a class="foto" href="${esc(lista[0].foto)}" target="_blank" rel="noopener"><img src="${esc(lista[0].mini)}" alt="${alt}" loading="lazy"></a>` : '';
+      return `<li tabindex="0" data-i="${i}"${cls ? ` class="${cls}"` : ''}>
+      <span class="n">${i+1}</span>
+      <div><time>${esc(quandoTxt(p.quando))}</time><b>${esc(p.nome || 'Ponto ' + (i+1))}</b>${p.captura ? `<span class="cap-linha">Captura: ${esc(capTxt(p.captura))}</span>` : ''}${p.nota ? `<p>${esc(p.nota)}</p>` : ''}${foto}</div></li>`;
+    }).join('');
+  }
+  let pronto = false;
+  const montar = () => {
+    if (pronto) return; pronto = true;
+    carregarLeaflet().then(() => {
+      caixa.innerHTML = '';
+      const map = L.map(caixa, { scrollWheelZoom:false });
+      const ruas = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18, attribution:'© OpenStreetMap' });
+      const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:18, attribution:'Imagens © Esri' });
+      sat.addTo(map);
+      L.control.layers({ 'Satélite':sat, 'Mapa':ruas }, null, { position:'topright' }).addTo(map);
+      map.on('focus', () => map.scrollWheelZoom.enable());
+      map.on('blur', () => map.scrollWheelZoom.disable());
+      if (!pts.length){ map.setView([-2.2, -61.2], 6); return; }   /* Rio Negro, de Manaus a Barcelos */
+      const cor = getComputedStyle(document.documentElement).getPropertyValue('--sun').trim() || '#f5c518';
+      for (let i = 1; i < pts.length; i++){
+        const voo = pts[i].modo === 'aviao';
+        L.polyline([[pts[i-1].lat, pts[i-1].lon], [pts[i].lat, pts[i].lon]],
+          { color:cor, weight: voo ? 2 : 4, opacity:.95, dashArray: voo ? '6 8' : null }).addTo(map);
+      }
+      const marcas = pts.map((p, i) => {
+        const ult = i === pts.length - 1;
+        const icon = L.divIcon({ className:'pin', html:`<span class="pin-n${ult ? ' ult' : ''}${p.captura ? ' cap' : ''}">${i+1}</span>`, iconSize:[28,28], iconAnchor:[14,14] });
+        const lf = fotosDe(p);
+        const img = lf.length ? `<a href="${esc(lf[0].foto)}" target="_blank" rel="noopener"><img class="pop-foto" src="${esc(lf[0].mini)}" alt="" loading="lazy"></a>${lf.length > 1 ? `<span class="pop-mais">+${lf.length - 1} foto${lf.length > 2 ? 's' : ''} na lista ao lado</span>` : ''}` : '';
+        return L.marker([p.lat, p.lon], { icon, title:p.nome || '' }).addTo(map)
+          .bindPopup(`${img}<b>${esc(p.nome || 'Ponto ' + (i+1))}</b><br>${esc(quandoTxt(p.quando))}${p.captura ? '<br><b>Captura:</b> ' + esc(capTxt(p.captura)) : ''}${p.nota ? '<br>' + esc(p.nota) : ''}`, { maxWidth:240 });
+      });
+      if (pts.length === 1) map.setView([pts[0].lat, pts[0].lon], 11);
+      else map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lon])), { padding:[30,30] });
+      const ir = i => { map.flyTo([pts[i].lat, pts[i].lon], Math.max(map.getZoom(), 11), { duration:.8 }); marcas[i].openPopup(); caixa.scrollIntoView({ behavior:'smooth', block:'nearest' }); };
+      const ul = $('#paradas');
+      if (ul){
+        ul.addEventListener('click', e => { const li = e.target.closest('li'); if (li) ir(+li.dataset.i); });
+        ul.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ const li = e.target.closest('li'); if (li){ e.preventDefault(); ir(+li.dataset.i); } } });
+      }
+    }).catch(() => { caixa.innerHTML = '<div class="mapa-msg">Não deu para carregar o mapa agora (sem internet ou serviço fora). A lista ao lado continua valendo.</div>'; });
+  };
+  if ('IntersectionObserver' in window){
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ io.disconnect(); montar(); } }, { rootMargin:'600px 0px' });
+    io.observe(caixa);
+  } else montar();
+}
+
+const cacheTempo = {};
+async function tempoHorario(loc){
+  const k = loc.lat + ',' + loc.lon;
+  if (!cacheTempo[k]) cacheTempo[k] = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}`
+    + `&hourly=precipitation,cloudcover,windspeed_10m,pressure_msl&timezone=America%2FManaus&past_days=2&forecast_days=16`)
+    .then(r => r.ok ? r.json() : null).catch(() => null);
+  return cacheTempo[k];
+}
+function condicoes(j, dia, per){
+  if (!j || !j.hourly) return null;
+  const H = j.hourly, idx = t => H.time.indexOf(t);
+  const hh = per.h.map(h => idx(`${dia}T${String(h).padStart(2,'0')}:00`)).filter(i => i >= 0);
+  if (!hh.length) return null;
+  const v = (a, i) => a[i] == null ? null : a[i];
+  const avg = a => { const xs = hh.map(i => v(a,i)).filter(x => x != null); return xs.length ? xs.reduce((s,x) => s+x, 0) / xs.length : null; };
+  const i0 = hh[0];
+  const p0 = v(H.pressure_msl, i0), p24 = i0 >= 24 ? v(H.pressure_msl, i0-24) : null, p3 = i0 >= 3 ? v(H.pressure_msl, i0-3) : null;
+  let rain24 = 0; for (let i = Math.max(0, i0-24); i < i0; i++) rain24 += H.precipitation[i] || 0;
+  if (p0 == null || avg(H.cloudcover) == null) return null;
+  return { cloud: avg(H.cloudcover), rain: hh.reduce((s,i) => s + (H.precipitation[i] || 0), 0), wind: Math.max(...hh.map(i => H.windspeed_10m[i] || 0)),
+           p: p0, dp24: p24 == null ? 0 : p0 - p24, dp3: p3 == null ? 0 : p0 - p3, rain24 };
+}
+
+let planoDiaSel = null;
+async function planoPesca(){
+  const P = lerPlano(), dias = Object.keys(P.dias || {}).sort();
+  if (!dias.length) return;
+  const hoje = new Date().toLocaleDateString('sv-SE', { timeZone:'America/Manaus' });
+  if (!planoDiaSel) planoDiaSel = dias.includes(hoje) ? hoje : dias[0];
+  const nomeDia = iso => new Date(iso + 'T12:00:00-04:00').toLocaleDateString('pt-BR', { weekday:'short' }).replace('.', '');
+  $('#planDays').innerHTML = dias.map(d => `<button type="button" data-d="${d}" aria-pressed="${d === planoDiaSel}"><b>${d.slice(8,10)}/${d.slice(5,7)}</b><small>${nomeDia(d)}${d === hoje ? ' · hoje' : ''}</small></button>`).join('');
+  $('#planDays').querySelectorAll('button').forEach(b => b.onclick = () => { planoDiaSel = b.dataset.d; planoPesca(); });
+
+  const D = P.dias[planoDiaSel] || {}, loc = D.local || P.local_padrao || LOCAIS.fozbranco;
+  const j = await tempoHorario(loc);
+  const agora = new Date(), horaManaus = +agora.toLocaleString('en-GB', { timeZone:'America/Manaus', hour:'2-digit', hour12:false });
+  const blocos = PERIODOS.map(per => {
+    const c = condicoes(j, planoDiaSel, per);
+    const auto = recomendar(c, per, { agua: D.agua_cor, nivel: D.nivel });
+    const man = D.periodos && D.periodos[per.k];
+    const r = man && man.isca ? { ...auto, iscas:[man.isca, man.alternativa || auto.iscas[1]], cores: man.cores || auto.cores, como: man.como, porque: man.motivo ? [man.motivo] : auto.porque } : auto;
+    const principal = ISCA_POR_NOME(r.iscas[0]);
+    const pic = principal && principal.img ? `<div class="lure-pic"><img src="${principal.img}" alt="Isca ${esc(r.iscas[0])}" loading="lazy" width="72" height="72"></div>` : `<div class="lure-pic"></div>`;
+    const f = (n, d) => n == null ? '–' : Number(n).toLocaleString('pt-BR', { maximumFractionDigits:d });
+    const tend = c ? (c.dp24 <= -2.5 || c.dp3 <= -1.5 ? 'caindo' : c.dp24 >= 2 ? 'subindo' : 'estável') : null;
+    const cond = c ? `<div class="cond"><span>nuvens ${f(c.cloud,0)}%</span><span>chuva ${f(c.rain,1)} mm</span><span>vento até ${f(c.wind,0)} km/h</span><span>pressão ${f(c.p,0)} hPa, ${tend}</span></div>`
+                   : `<div class="cond"><span>Previsão do tempo deste dia ainda não disponível: plano base.</span></div>`;
+    const ehAgora = planoDiaSel === hoje && per.h.includes(horaManaus);
+    return `<article class="period${ehAgora ? ' now' : ''}">
+      <div class="period-h"><h3>${per.nome}${ehAgora ? ' · agora' : ''}</h3><span>${per.faixa}</span></div>
+      ${cond}
+      <div class="pick">${pic}<div><div class="pick-name">${esc(r.iscas[0])}</div><div class="pick-alt">${TIPO[r.modo] || ''} · alternativa: ${esc(r.iscas[1])}</div></div></div>
+      <div class="swatches" aria-label="Cores">${r.cores.map(n => `<span><i style="background:${corHex(n)}" aria-hidden="true"></i>${esc(n)}</span>`).join('')}</div>
+      <p class="how">${esc(r.como || COMO[r.modo])}</p>
+      ${r.porque.length ? `<ul class="why">${r.porque.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+      <span class="src ${man && man.isca ? 'man' : 'auto'}">${man && man.isca ? 'Definido pelo Oppen com o guia' : 'Calculado pela previsão'}</span>
+    </article>`;
+  }).join('');
+  const agua = D.agua_cor ? CORES_AGUA[D.agua_cor].nome : 'preta transparente (padrão do Rio Negro; confirmar no barco)';
+  const nivel = { descendo:'descendo', estavel:'estável', subindo:'subindo' }[D.nivel] || 'sem informação';
+  $('#planDay').innerHTML = `<div class="day-info"><span>Local: <b>${esc(loc.nome)}</b></span><span>Água: <b>${esc(agua)}</b></span><span>Rio: <b>${nivel}</b></span></div>`
+    + (D.nota ? `<p class="day-note">${esc(D.nota)}</p>` : '')
+    + (D.resultado ? `<p class="day-note"><b>O que funcionou:</b> ${esc(D.resultado)}</p>` : '')
+    + `<div class="periods">${blocos}</div>`;
+  const at = P.atualizado ? new Date(P.atualizado).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short', timeZone:'America/Manaus' }) : '';
+  $('#planFoot').textContent = `Dados do plano atualizados em ${at} (horário de Manaus)${P.por ? ' por ' + P.por : ''}. Previsão: Open-Meteo.` + (j ? '' : ' Previsão do tempo fora do ar agora: mostrando o plano base.');
+}
+
+/* ================= CAMPEONATO DO MAIOR TUCUNARÉ ================= */
+function campeonato(){
+  let C, T;
+  try { C = JSON.parse(document.getElementById('campeonato-dados').textContent); } catch(e){ C = { barcos:[], fora:[] }; }
+  try { T = JSON.parse(document.getElementById('trajeto-dados').textContent); } catch(e){ T = { pontos:[] }; }
+  const norm = x => String(x || '').trim().toLowerCase();
+  const fora = new Set((C.fora || []).map(f => f.quando));
+  const barcos = (C.barcos || []).map((b, i) => ({ ...b, nome: b.nome || `Barco ${i+1}`, dupla: b.dupla || [] }));
+  const barcoDe = cap => {
+    if (cap.barco) return barcos.find(b => norm(b.nome) === norm(cap.barco)) || { nome: cap.barco, dupla:[] };
+    return barcos.find(b => b.dupla.some(n => n && norm(n) === norm(cap.pescador))) || null;
+  };
+  const caps = (T.pontos || [])
+    .filter(p => p.captura && /tucunar/i.test(p.captura.especie || '') && Number(p.captura.tamanho_cm) > 0 && fotoOk(p.foto) && !fora.has(p.quando))
+    .map(p => ({ ...p.captura, cm: Number(p.captura.tamanho_cm), quando: p.quando, foto: p.foto, mini: fotoOk(p.mini) ? p.mini : p.foto, lugar: p.nome, barcoObj: barcoDe({ ...p.captura }) }))
+    .sort((a, b) => b.cm - a.cm || new Date(a.quando) - new Date(b.quando));
+  const cmTxt = v => String(v).replace('.', ',');
+  $('#campStamp').textContent = caps.length ? `${caps.length} ${caps.length === 1 ? 'tucunaré medido' : 'tucunarés medidos'}` + (C.encerrado ? ' · encerrado' : '') : '';
+  if (!caps.length){
+    const nomes = barcos.flatMap(bc => bc.dupla.filter(Boolean).map(n => ({ n, bc })));
+    const raiasV = nomes.length
+      ? nomes.map(x => `<li class="raia parado" style="--x:0%"><div class="raia-nome"><span class="pos">–</span><span><b>${esc(x.n)}</b><small>${esc(x.bc.nome)}</small></span></div><div class="pista"><div class="rastro"></div><span class="corredor"><span class="bola"></span></span></div></li>`).join('')
+      : `<li class="raia-vazia">Largada na segunda, 26/out. Os pescadores entram na pista no primeiro dia, e cada tucunaré medido empurra a foto dele para a frente.</li>`;
+    $('#campCorpo').innerHTML = `<div class="corrida"><div class="corrida-topo"><h3>Corrida do maior tucunaré</h3><p>Largada: <b>segunda, 26/out</b></p></div><ol class="raias">${raiasV}</ol></div>`;
+    return;
+  }
+  // corrida: uma raia por pescador com o maior tucunaré dele; quem ainda não pegou fica na largada
+  const melhorPor = new Map();
+  caps.forEach(c => { const k = norm(c.pescador) || ('?' + c.quando); if (!melhorPor.has(k)) melhorPor.set(k, c); });
+  const raias = [...melhorPor.values()].map(c => ({ nome: c.pescador || 'Pescador a confirmar', barco: c.barcoObj, c }));
+  barcos.forEach(bc => bc.dupla.filter(Boolean).forEach(n => { if (!melhorPor.has(norm(n))) raias.push({ nome: n, barco: bc, c: null }); }));
+  const maxCm = caps[0].cm, ini = 30, fim = Math.max(90, Math.ceil((maxCm + 5) / 10) * 10);  /* pista de 30 a 90 cm; só estica se alguém passar de 85 cm */
+  const xPct = cm => Math.max(4, Math.min(96, (cm - ini) / (fim - ini) * 100));
+  const ticks = []; for (let t = ini; t <= fim; t += 10) ticks.push(t);
+  const L = caps[0], lb = L.barcoObj;
+  const topo = `<div class="corrida-topo"><h3>${C.encerrado ? 'Resultado final' : 'Corrida do maior tucunaré'}</h3>
+    <p>${C.encerrado ? 'Barco campeão' : 'Barco na frente'}: <b>${esc(lb ? lb.nome : 'a confirmar')}</b>${lb && lb.dupla.filter(Boolean).length ? ' · ' + esc(lb.dupla.filter(Boolean).join(' e ')) : ''}${lb && lb.piloteiro ? ' · piloteiro ' + esc(lb.piloteiro) : ''}</p></div>`;
+  const escala = `<div class="escala" aria-hidden="true">${ticks.map(t => `<span style="left:${(t - ini) / (fim - ini) * 100}%">${t} cm</span>`).join('')}</div>`;
+  const lista = raias.map((r, i) => {
+    const lider = i === 0 && r.c;
+    const sub = [r.barco ? r.barco.nome : '', r.c && r.c.especie, r.c && quandoTxt(r.c.quando)].filter(Boolean).join(' · ');
+    const corredor = r.c
+      ? `<a class="corredor" href="${esc(r.c.foto)}" target="_blank" rel="noopener" title="${esc(capTxt(r.c))}"><span class="cm">${cmTxt(r.c.cm)} cm</span><img src="${esc(r.c.mini)}" alt="${esc(capTxt(r.c))}" loading="lazy"></a>`
+      : `<span class="corredor"><span class="bola"></span></span>`;
+    return `<li class="raia${lider ? ' frente' : ''}${r.c ? '' : ' parado'}" style="--x:${r.c ? xPct(r.c.cm) : 0}%">
+      <div class="raia-nome"><span class="pos">${r.c ? i + 1 + 'º' : '–'}</span><span><b>${esc(r.nome)}</b><small>${esc(sub || 'ainda sem tucunaré medido')}</small></span></div>
+      <div class="pista"><div class="rastro"></div>${corredor}</div></li>`;
+  }).join('');
+  const corrida = `<div class="corrida">${topo}${escala}<ol class="raias">${lista}</ol>
+    <p class="corrida-pe">Cada foto é o maior tucunaré do pescador, na medida da régua. Toque na foto para ver inteira.</p></div>`;
+  const galeria = `<h3 style="margin-top:36px">Todos os tucunarés medidos</h3>
+    <ul class="galeria">` + caps.map(c => `<li><a href="${esc(c.foto)}" target="_blank" rel="noopener"><img src="${esc(c.mini)}" alt="${esc(capTxt(c))}" loading="lazy"></a>
+      <div><b>${cmTxt(c.cm)} cm</b>${esc([c.barcoObj ? c.barcoObj.nome : '', c.pescador].filter(Boolean).join(' · '))}<br>${esc(quandoTxt(c.quando))}</div></li>`).join('') + '</ul>';
+  $('#campCorpo').innerHTML = corrida + galeria;
+  animarCorrida();
+}
+
+function animarCorrida(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const raias = [...document.querySelectorAll('#campCorpo .raia:not(.parado)')];
+  const rodar = () => raias.forEach((r, i) => {
+    const c = r.querySelector('.corredor'), t = r.querySelector('.rastro');
+    const opt = { duration: 1400, delay: i * 120, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' };
+    if (c && c.animate) c.animate([{ left: '0%' }, { left: getComputedStyle(r).getPropertyValue('--x') }], opt);
+    if (t && t.animate) t.animate([{ width: '0%' }, { width: getComputedStyle(r).getPropertyValue('--x') }], opt);
+  });
+  const alvo = document.getElementById('campeonato');
+  if (!('IntersectionObserver' in window) || !alvo) return rodar();
+  const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); rodar(); } }, { threshold: .25 });
+  io.observe(alvo);
+}
+
+/* ================= INÍCIO ================= */
+contagem(); setInterval(contagem, 1000);
+idadeDados();
+linhaDoTempo();
+graficoRio();
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(graficoRio, 150); });
+voo(); setInterval(statusVoo, 60000);
+iscas();
+planoPesca();
+trajeto();
+campeonato();
+dia();
+checklist();
+navAtiva();
+previsao('fozbranco');
+</script>
+</body>
+</html>
